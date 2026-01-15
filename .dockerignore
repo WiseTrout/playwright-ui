@@ -1,0 +1,5 @@
+node_modules
+.gitignore
+playwright-report
+test-results
+README.md

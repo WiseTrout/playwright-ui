@@ -1,0 +1,32 @@
+<h1>
+    Settings
+</h1>
+<form action="/update-settings" method="post" enctype="multipart/form-data">
+<a href="/">⬅️ Back to tests</a>
+    <div>
+            
+        <h2>
+            Default list of browsers to test:
+        </h2>
+        <button type="button" onclick="selectAll(this.parentNode)">Select all</button>
+        <button type="button" onclick="selectNone(this.parentNode)">Select none</button>
+        <br>
+            {{#each browsers}}
+                <label>
+                    <input 
+                    type="checkbox" 
+                    name="browser--{{this.name}}" 
+                    {{#if this.defaultChecked}}checked{{/if}}>
+                    {{this.name}} 
+                </label>
+                <br>
+            {{/each}}
+    </div>
+    <ul>
+
+        <button>Submit settings</button>
+    </ul>
+
+</form>
+
+<script src="/js/index.js"></script>

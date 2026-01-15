@@ -1,0 +1,305 @@
+:root{
+    --color-pending: rgb(106, 106, 106);
+    --color-running: rgb(58, 101, 187);
+    --color-passed: rgb(30, 111, 30);
+    --color-failed: rgb(201, 87, 87);
+}
+
+/* Base styles */
+* {
+    box-sizing: border-box;
+}
+:root {
+  --color-text: #00418C;
+  --color-background: #E4EDF4;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: var(--color-background);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    margin: 0;
+}
+
+/* Main heading */
+h1 {
+    text-align: center;
+    color: var(--color-text);
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+}
+
+h2 {
+    text-transform: capitalize;
+    color: #2c3e50;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #667eea;
+}
+
+h3 {
+    color: #34495e;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+/* Form container */
+form {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Form sections */
+form > div {
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* Lists */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    margin-bottom: 1.5rem;
+}
+
+/* Input fields */
+input[type="text"] {
+    width: 100%;
+    max-width: 500px;
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Checkboxes and radio buttons */
+input[type="checkbox"],
+input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.5rem;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+/* Labels */
+label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #495057;
+    margin-right: 1.5rem;
+    margin-bottom: 0.5rem;
+    transition: color 0.2s;
+}
+
+label:hover {
+    color: #667eea;
+}
+
+/* File input */
+input[type="file"] {
+    margin-left: 0.5rem;
+    padding: 0.5rem;
+}
+
+/* Buttons */
+button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+button[type="submit"],
+form > ul > button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+button[type="submit"]:hover,
+form > ul > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+button[type="button"] {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+button[type="button"]:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* Submit button container */
+form > ul:last-of-type {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.test::after{
+    margin-left: auto;
+}
+
+.test--skipped{
+    color:rgb(141, 158, 175);
+}
+
+.test--skipped::after{
+    content: "🚫";
+}
+
+.test--pending{
+    color: rgb(106, 106, 106);
+}
+
+.test--pending::after{
+    content: "⏸️";
+}
+
+.test--running{
+    color: rgb(58, 101, 187);
+}
+
+.test--running::after{
+    content: "▶️";
+}
+
+.test--passed{
+    color: rgb(30, 111, 30);
+}
+
+.test--passed::after{
+    content: "✅";
+}
+
+.test--failed, .test--interrupted, .test--timedOut{
+    color: rgb(201, 87, 87);
+}
+
+.test--failed::after, .test--interrupted::after, .test--timedOut::after{
+    content: "❌";
+}
+
+.accordion{
+    cursor: pointer;
+}
+
+.accordion::after{
+    content: '+';
+    margin-left: 20px;
+}
+
+.accordion.expanded::after{
+    content: '-';
+}
+
+.accordion + *{
+    display: none;
+}
+
+.accordion.expanded + *{
+    display: block;
+}
+
+.label::before{
+    margin-right: 5px;
+}
+
+.label--pending{
+    color: rgb(106, 106, 106);
+}
+
+.label--skipped{
+    color:rgb(141, 158, 175);
+}
+
+.label--skipped::before{
+    content: "🚫";
+}
+
+.label--pending::before{
+    content: "⏸️";
+}
+
+.label--running{
+    color: rgb(58, 101, 187);
+}
+
+.label--running::before{
+    content: "▶️";
+}
+
+.label--passed{
+    color: rgb(30, 111, 30);
+}
+
+.label--passed::before{
+    content: "✅";
+}
+
+.label--failed, .label--interrupted, .label--timedOut{
+    color: rgb(201, 87, 87);
+}
+
+.label--failed::before, .label--interrupted::before, .label--timedOut::before{
+    content: "❌";
+}
+
+
+.text--pending{
+    color: var(--color-pending);
+}
+.text--running{
+    color: var(--color-running);
+}
+.text--passed{
+    color: var(--color-passed);
+}
+.text--failed,
+.text--interrupted,
+.text--timedOut{
+    color: var(--color-failed);
+}
