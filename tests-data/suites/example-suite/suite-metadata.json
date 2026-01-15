@@ -1,0 +1,9 @@
+{
+    "title": "Example suite",
+    "testFiles": [
+        "example-test-1.spec.js", 
+        "example-test-2.spec.js"
+    ],
+    "sequential": true,
+    "sequenceInterval": 60000
+}
