@@ -27,10 +27,10 @@ function startPeriodicDataUpdate(){
     requestInProcess = true;
     try{
         
-        const { data, status } = await fetchData();
+        const { data, complete } = await fetchData();
         showData(data);
 
-        if(status === 'complete') {
+        if(complete) {
             clearInterval(interval);
             h1.innerText = 'Tests complete';
             retryBtn.disabled = false;
