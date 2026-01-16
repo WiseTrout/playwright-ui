@@ -95,40 +95,14 @@ app.post('/run-tests', async (req, res) => {
 
     const testFilesToRun = await getTestFilesInfo(); 
     
-    
-
     initializeTestLogs(testFilesToRun, settingsObject);
 
     res.redirect('/status');
 
-    // return;
+    await launchTests(settingsObject);
 
-    return;
+    await launchPlaywrightReport();
 
-    const testSpawnOptions = ['playwright', 'test'];
-
-    if(settingsObject.visualRegression === 'update') testSpawnOptions.push('--update-snapshots');
-
-    testsProcess = spawn('npx', testSpawnOptions);
-
-    testsProcess.stdout.setEncoding('utf-8');
-
-    testsProcess.stdout.on('data', (data) => {
-        
-        console.log(data);
-        
-    })
-
-    testsProcess.on('exit', () => {
-        playwrightReportProcess = spawn('npx',  ['playwright', 'show-report', '--host',  '0.0.0.0']);
-        playwrightReportProcess.on('spawn', () => {
-        })
-
-        playwrightReportProcess.on('error', (err) => {
-            console.error(`Failed to start Playwright report subprocess: ${err.message}`);
-            serverError = 'Failed to launch PLaywright report';
-        });
-    })
 })
 
 app.post('/update-settings', async (req, res) => {
@@ -421,5 +395,42 @@ function combineTestAndSuiteInfo(testFiles, suitesMetadata){
 async function readAppSettings(){
     const json = await fs.promises.readFile('app-settings.json', 'utf-8');
     return JSON.parse(json);
+}
+
+function launchTests(settingsObj){
+    return new Promise((res, rej) => {
+        const testSpawnOptions = ['playwright', 'test'];
+
+        if(settingsObj.global.visualRegression === 'update') testSpawnOptions.push('--update-snapshots');
+
+        testsProcess = spawn('npx', testSpawnOptions);
+
+        testsProcess.stdout.setEncoding('utf-8');
+
+        testsProcess.stdout.on('data', (data) => {
+            
+            console.log(data);
+            
+        })
+
+        testsProcess.on('exit', () => {
+            res()
+        })
+
+        testsProcess.on('error', (err) => rej(err))
+    });
+}
+
+function launchPlaywrightReport(){
+    return new Promise((res, rej) => {
+        playwrightReportProcess = spawn('npx',  ['playwright', 'show-report', '--host',  '0.0.0.0']);
+        playwrightReportProcess.on('spawn', () => {
+            res();
+        })
+
+        playwrightReportProcess.on('error', (err) => {
+            rej(err)
+        });
+    });
 }
 

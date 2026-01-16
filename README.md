@@ -48,7 +48,7 @@ Pick a name for the test file, it must end in ".spec.js". For example, "my-new-t
 
 The test file must be placed inside "/tests" and have the name we picked in step 1).
 
-All tests must be grouped. To do so, one must call the createDescribe() function and pass the file name to it. The returned value will be a function that can be used the same way that a test.describe() function would. The difference is that behind the scenes, this new function reads the test settings and filters out the tests we must skip.
+All tests must be grouped, these will be the test categories that we see in the menu. When there are several test files in one suite, all the test groups across all files will be concatenated and shown as one list under that suite name. To group tests inside a test file, one must call the createDescribe() function and pass the file name to it. The returned value will be a function that can be used the same way that a test.describe() function would. The difference is that behind the scenes, this new function reads the test settings and filters out the categories we must skip when we launch the tests. 
 
 The separate tests inside of each group must be registered using the test() function. *Important*: this function must be imported from "./fixtures.js", *not* directly from Playwright. The reason is that the fixture adds test progress logging.
 
