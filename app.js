@@ -1,7 +1,7 @@
 import express from 'express';
 import { engine } from 'express-handlebars';
 import { spawn } from 'child_process';
-import fs, { readFileSync, writeFileSync } from 'fs';
+import fs from 'fs';
 import fileUpload from 'express-fileupload';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -34,8 +34,7 @@ app.use(fileUpload())
 
 app.get('/', async (_, res) => {
 
-    const globalSettings = appSettings.globalSettings.map(setting => ({...setting, name: `global--${setting.name}`}));
-
+    
     const menuCategories = testSuites.map(suite => {
         const {title, categories, machineName} = suite;
         return {
@@ -55,7 +54,7 @@ app.get('/', async (_, res) => {
 
     res.render('index', {
         title: appSettings.applicationName, 
-        globalSettings,
+        globalSettings: appSettings.globalSettings,
         testSuites: menuCategories, 
         browsers: menuBrowsers
     });
