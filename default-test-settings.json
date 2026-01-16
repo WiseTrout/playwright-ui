@@ -1,6 +1,6 @@
 {
   "global": {
-    "baseUrl": "wisetrout.com"
+    "baseUrl": "https://wisetrout.com"
   },
   "selectedBrowsers": [
     "chromium"

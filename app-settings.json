@@ -6,7 +6,7 @@
       "name": "baseUrl",
       "label": "Base URL",
       "type": "text",
-      "defaultValue": "wisetrout.com",
+      "defaultValue": "https://wisetrout.com",
       "required": true
     }
   ]
