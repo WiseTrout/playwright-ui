@@ -14,7 +14,8 @@
                     <input 
                     type="{{this.type}}" 
                     value="{{this.defaultValue}}" 
-                    name="{{this.name}}"
+                    name="global--{{this.name}}"
+                    aria-label="{{this.label}}"
                     {{#if this.required}} required {{/if}}
                     >
                 </li>
