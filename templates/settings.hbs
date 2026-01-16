@@ -4,6 +4,16 @@
 <form action="/update-settings" method="post" enctype="multipart/form-data">
 <a href="/">⬅️ Back to tests</a>
     <div>
+        <h2>Default settings</h2>
+        {{#each globalSettings}}
+            <h3>{{this.label}}</h3>
+            <input 
+                name="global--{{this.name}}"
+                type="{{this.type}}"
+                value="{{this.defaultValue}}"
+                aria-label="{{this.label}}"
+                >
+        {{/each}}
             
         <h2>
             Default list of browsers to test:

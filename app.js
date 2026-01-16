@@ -18,7 +18,6 @@ const app = express();
 
 let testsProcess = null;
 let playwrightReportProcess = null;
-let serverError = null;
 
 let testSuites;
 let availableBrowsers;
@@ -71,7 +70,7 @@ app.get('/settings', (_, res) => {
         }
     })
 
-    res.render('settings', {...appSettings, browsers});
+    res.render('settings', {globalSettings: appSettings.globalSettings, browsers});
 
 });
 
@@ -106,12 +105,12 @@ app.post('/run-tests', async (req, res) => {
 })
 
 app.post('/update-settings', async (req, res) => {
-    
-    appSettings = getAppSettings(req);
 
     const oldSettings = JSON.parse(fs.readFileSync('app-settings.json'));
 
-    const settingsWritePromise = fs.promises.writeFile('app-settings.json', JSON.stringify({...oldSettings, ...appSettings},null, 2));
+    appSettings = updateAppSettings(oldSettings, req);
+
+    const settingsWritePromise = fs.promises.writeFile('app-settings.json', JSON.stringify(appSettings ,null, 2));
 
     const promises = [settingsWritePromise];
 
@@ -267,24 +266,23 @@ function checkIfTestsAreDone(logsObj){
     }
     return true;
 }
-function getAppSettings(req){
+function updateAppSettings(oldSettings, req){
 
-    const newSettings = {};
-
-    newSettings.defaultBaseURL = req.body['base-url'];
-    newSettings.addAccessHeaderByDefault = req.body['add-header'] === 'on';
+    const newSettings = JSON.parse(JSON.stringify(oldSettings));
 
     const checkedBrowsers = [];
 
     for(const key in req.body){
+        if(key.includes('global--')){
+            newSettings.globalSettings.find(setting => setting.name === key.split('--')[1]).defaultValue = req.body[key];
+            continue;
+        }
         if(key.includes('browser--')){
             checkedBrowsers.push(key.split('--')[1]);
         }
     }
 
     newSettings.defaultBrowsersToUse = checkedBrowsers;
-
-
     
     return newSettings;
 }

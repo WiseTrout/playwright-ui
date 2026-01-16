@@ -1,6 +1,8 @@
 {
   "applicationName": "Playwright UI",
-  "defaultBrowsersToUse": [ "chromium" ],
+  "defaultBrowsersToUse": [
+    "chromium"
+  ],
   "globalSettings": [
     {
       "name": "baseUrl",
