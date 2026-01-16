@@ -46,8 +46,5 @@ services:
         source: ./test-settings.json
         target: /app/test-settings.json
       - type: bind
-        source: ./results.json
-        target: /app/results.json
-      - type: bind
-        source: ./all-suites-selected.json
-        target: /app/all-suites-selected.json
+        source: ./default-test-settings.json
+        target: /app/default-test-settings.json

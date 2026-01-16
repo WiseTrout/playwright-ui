@@ -7,7 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { createFileUploadPromise } from './helpers/file-upload-promise.js';
-import { readLogs } from './helpers/log-test.js';
+import { clearLogs, logTests, readLogs } from './helpers/log-test.js';
 
 console.log('Launching menu...');
 
@@ -58,8 +58,7 @@ app.get('/', async (_, res) => {
         title: appSettings.applicationName, 
         globalSettings,
         testSuites: menuCategories, 
-        browsers: menuBrowsers, 
-        default_base_url: appSettings.defaultBaseURL
+        browsers: menuBrowsers
     });
 });
 
@@ -91,39 +90,18 @@ app.post('/run-tests', async (req, res) => {
 
     const settingsObject = getTestSettings(req, testSuites);
 
-    try{
+    const settingsJson = JSON.stringify(settingsObject, null, 2);
+    fs.writeFileSync('test-settings.json', settingsJson);
 
-        const settingsJson = JSON.stringify(settingsObject, null, 2);
-        await  fs.promises.writeFile('test-settings.json', settingsJson);
-    }catch(err){
-        
-        serverError = 'File writing error:' + err;
-        return;
-        
-    }   
+    const testFilesToRun = await getTestFilesInfo(); 
+    
+    
 
-    // await spawnPromise('npx', ['playwright', 'test', '--list', '--reporter=json']);
+    initializeTestLogs(testFilesToRun, settingsObject);
 
-    // initializeTestLogs();
-
-    // res.redirect('/');
+    res.redirect('/status');
 
     // return;
-
-    const process = spawn('npx', ['playwright', 'test', '--list', '--reporter=json']);
-
-    process.stdout.setEncoding('utf-8');
-
-    process.stdout.on('data', (data) => {
-        
-        console.log(data);
-        fs.writeFileSync('results.json', data);
-        
-    })
-
-    process.on('exit', () => {
-        res.redirect('/status');
-    });
 
     return;
 
@@ -187,19 +165,11 @@ app.post('/update-settings', async (req, res) => {
 });
 
 app.get('/get-tests-update', async (_, res) => {
-    
+
+    const data = readLogs();
 
     res.json({
-        data: [],
-        complete: true
-    })
-
-    return;
-
-    if(serverError) throw new Error(serverError);
-
-    res.json({
-        data: readLogs(),
+        data,
         complete: checkIfTestsAreDone(data)
     })
 })
@@ -209,8 +179,6 @@ loadAppInfo().then(({browsers, suites, settings}) => {
     availableBrowsers = browsers;
     testSuites = suites;
     appSettings = settings;
-
-    console.log(suites[0].categories);
 
     app.listen(3000, () => console.log(`Testing menu is available at http://localhost:${process.env.TESTS_MENU_PORT || 3000}`));
 })
@@ -255,26 +223,15 @@ function getTestSettings(req, suitesList){
 
         if(!suiteSettings){
             suiteSettings = {
-                machineName: testsSuiteMachineName,
-                title: suiteInfo.title,
-                categories: [],
-                testFileNames: suiteInfo.testFileNames
+                ...suiteInfo,
+                categories: []
             };
-            
-
-            if(suiteInfo.sequencial){
-                suiteSettings.sequencial = true;
-                suiteSettings.sequenceInterval = suiteInfo.sequenceInterval || 0;
-            }
 
             testsSettings.suites.push(suiteSettings);
         }
 
-        if(settingName === 'category' || settingName === 'file'){
-            suiteSettings.categories.push({
-                title: settingValue,
-                type: settingName
-            });
+        if(settingName === 'category'){
+            suiteSettings.categories.push(settingValue);
         }else{
             suiteSettings[settingName] = settingValue;
         }
@@ -287,26 +244,36 @@ function getTestSettings(req, suitesList){
 
 }
 
-async function initializeTestLogs(settingsObject){
+async function initializeTestLogs(testFiles, settingsObject){
 
     const testLogs = [];
+    
 
-    for(const suiteMachineName in settingsObject.suites){
+    for(const testFile of testFiles){
+        const suiteInfo = settingsObject.suites.find(suite => suite.testFiles.includes(testFile.file));
+        
+        for(const category of testFile.suites){
+            
 
-        const suite = settingsObject.suites[suiteMachineName];
+            for(const test of category.specs){
 
-        for(const category of suite.categories){
-
-            for(const test of category.tests){
                 for(const browser of settingsObject.selectedBrowsers){
-                testLogs.push({suiteName: suite.title, groupName: category.title, title: test.title, browser});
-            }
+                    testLogs.push({
+                        suiteName: suiteInfo.title, 
+                        groupName: category.title, 
+                        title: test.title, 
+                        browser
+                    });
+                }
+
             }
 
         }
+
     }
 
-    rewriteLogs(testLogs);
+    clearLogs();
+    logTests(testLogs);
 
 
 }
@@ -368,7 +335,7 @@ async function readAvailableBrowsers(){
 
 async function readSuitesInfo(){
 
-    setDefaultTestSettings();
+    enableAllTests();
 
     const [testFilesInfo, suitesMetadata] = await Promise.all([getTestFilesInfo(), readSuitesMetadata()]);
     
@@ -379,10 +346,9 @@ async function readSuitesInfo(){
     return suitesInfo;
 }
 
-function setDefaultTestSettings(){
-    const defaultSettingsJson = readFileSync('all-suites-selected.json');
-
-    writeFileSync('test-settings.json', defaultSettingsJson);
+function enableAllTests(){
+    const defaultSettings = fs.readFileSync('default-test-settings.json');
+    fs.writeFileSync('test-settings.json', defaultSettings);
 }
 
 async function getTestFilesInfo(){
@@ -395,7 +361,7 @@ async function getTestFilesInfo(){
         process.stdout.on('data', (json) => {
             
             const data = JSON.parse(json);
-            res(data.suites)
+            res(data.suites);
             
         })
 
@@ -431,21 +397,20 @@ async function readSuitesMetadata(){
 function combineTestAndSuiteInfo(testFiles, suitesMetadata){
     const suitesInfo = suitesMetadata.map(metadata => {
         const suiteInfo = {...metadata, categories: []};
+
         for(const fileName of metadata.testFiles){
-            console.log(fileName);
             
             const fileInfo = testFiles.find(test => test.file === fileName);
             if(!fileInfo) throw new Error(`Test file ${fileName} not found`);
+
             const fileTestCategories = fileInfo.suites.map(testGroup => ({
                 title: testGroup.title,
                 tests: testGroup.specs.map(test => test.title)
             }))
-            console.log(fileTestCategories);
             
             suiteInfo.categories = suiteInfo.categories.concat(fileTestCategories);
 
-            console.log(suiteInfo.categories);
-            
+
         }
          return suiteInfo;
     });

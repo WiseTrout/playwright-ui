@@ -1,5 +1,4 @@
 import fs from 'fs';
-import { fileURLToPath } from 'url';
 
 
 export default function readSettingsSync(){
