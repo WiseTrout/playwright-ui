@@ -1,17 +1,21 @@
 import { expect } from '@playwright/test';
 import { test } from "./fixtures.js";
+import createDescribe from './lib/describe.js';
 
-test.describe('Basic tests', () => {
-    test('Page title', async ({ page }) => {
-        await page.goto('/');
-        await expect(page).toHaveTitle('What is this site? | Wise Trout');
-    });
+const describe = createDescribe("example-test-1.spec.js");
 
-    test('Page header', async ({page}) => {
-        await page.goto('/');
-        await expect(page.getByText('What is this site?')).toBeVisible();
-    });
+describe('Basic tests', () => {
+        test('Page title', async ({ page }) => {
+            await page.goto('/');
+            await expect(page).toHaveTitle('What is this site? | Wise Trout');
+        });
+
+        test('Page header', async ({page}) => {
+            await page.goto('/');
+            await expect(page.getByText('What is this site?')).toBeVisible();
+        });
 
 });
+
 
 

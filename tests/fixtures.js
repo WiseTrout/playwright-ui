@@ -5,29 +5,38 @@ import readSettingsSync from '../helpers/read-settings-sync';
 
 const settings = readSettingsSync();
 
-const { addAccessHeader, suites, biggestInterval } = settings;
+const { suites, biggestInterval } = settings;
 
 export const test =  base.extend({
     forEachTest: [async ({page}, use, testInfo) => {
 
-        const suite = findSuite(suites, testInfo);
+        const testFilePathArray = testInfo.file.split('/');
+        const fileName = testFilePathArray[testFilePathArray.length -1];
 
-        const testLogsInfo = findTestLogsInfo(suites, testInfo);
+        const suite = suites.find(suite => suite.testFiles.includes(fileName));
+
+        const testCategoryName = testInfo.titlePath[1];
+
+        if(!suite.categories.includes(testCategoryName)){
+            testInfo.skip();
+            return;
+        }
+
+        const testLogsInfo =  {
+            suiteName: suite.title, 
+            groupName: testCategoryName, 
+            title: testInfo.title, 
+            browser: testInfo.project.name
+        };
 
         if(suite.sequential){
-
             const thisTestIsFirst = checkIfAllTestsArePending();
-
             if(!thisTestIsFirst) await page.waitForTimeout(suite.sequenceInterval);
         }
 
         
 
         logTestStart(testLogsInfo);
-        
-        if(addAccessHeader)  {
-            await page.setExtraHTTPHeaders({ "X-Salesforce": process.env.ACCESS_HEADER});
-        }
 
         // Run the test
         await use();
@@ -40,37 +49,8 @@ export const test =  base.extend({
     }]
 });
 
-
-function findTestLogsInfo(suites, testInfo){
-    const suiteInfo = findSuite(suites, testInfo);
-    const testCategoryName = testInfo.titlePath[1];
-
-    return {
-        suiteName: suiteInfo.title, 
-        groupName: testCategoryName, 
-        title: testInfo.title, 
-        browser: testInfo.project.name
-    };
-
-}
-
-function findSuite(suites, testInfo){
-
-    const testFilePathArray = testInfo.file.split('/');
-    const fileName = testFilePathArray[testFilePathArray.length -1];
-
-     for(const suiteName in suites){
-            if(suites[suiteName].testFileNames.includes(fileName)){
-                return suites[suiteName];
-            }
-    }
-
-    throw new Error('Could not find test suite');
-}
-
 function logTestStart(testLogsInfo){
 
-    
     updateTestStatus(
         {
             ...testLogsInfo, 

@@ -48,13 +48,19 @@ Pick a name for the test file, it must end in ".spec.js". For example, "my-new-t
 
 The test file must be placed inside "/tests" and have the name we picked in step 1).
 
-*important*: instead of importing the "test" function directly from Playwright, we must use the fixture:
+All tests must be grouped. To do so, one must call the createDescribe() function and pass the file name to it. The returned value will be a function that can be used the same way that a test.describe() function would. The difference is that behind the scenes, this new function reads the test settings and filters out the tests we must skip.
+
+The separate tests inside of each group must be registered using the test() function. *Important*: this function must be imported from "./fixtures.js", *not* directly from Playwright. The reason is that the fixture adds test progress logging.
+
+Example:
 
 ```
 import { test } from "./fixtures.js";
+import createDescribe from './lib/describe.js';
 
+const describe = createDescribe("my-new-test.spec.js");
 
-test.describe('category 1', () => {
+describe('category 1', () => {
     test('Test 1', () => {
         // ...
     })
