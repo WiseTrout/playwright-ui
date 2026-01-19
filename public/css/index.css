@@ -303,3 +303,8 @@ form > ul:last-of-type {
 .text--timedOut{
     color: var(--color-failed);
 }
+
+.btn-danger{
+    background-color: rgb(255, 157, 157);
+    color: rgb(132, 45, 45);
+}
