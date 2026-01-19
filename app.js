@@ -22,6 +22,7 @@ let playwrightReportProcess = null;
 let testSuites;
 let availableBrowsers;
 let appSettings;
+let testConsoleLogs = '';
 
 app.engine('hbs', engine({extname: '.hbs', partialsDir: __dirname + '/templates/partials'}));
 app.set('view engine', 'hbs');
@@ -99,6 +100,8 @@ app.post('/run-tests', async (req, res) => {
 
     if(testsProcess) stopTests();
 
+    testConsoleLogs = '';
+
     const settingsObject = getTestSettings(req, testSuites);
 
     const settingsJson = JSON.stringify(settingsObject, null, 2);
@@ -155,8 +158,11 @@ app.get('/get-tests-update', async (_, res) => {
 
     res.json({
         data,
-        complete: checkIfTestsAreDone(data)
-    })
+        complete: checkIfTestsAreDone(data),
+        logs: testConsoleLogs
+    });
+
+    testConsoleLogs = '';
 })
 
 loadAppInfo().then(({browsers, suites, settings}) => {
@@ -429,6 +435,8 @@ function launchTests(settingsObj){
         testsProcess.stdout.on('data', (data) => {
             
             console.log(data);
+
+            testConsoleLogs += data;
             
         })
 

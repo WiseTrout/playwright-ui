@@ -1,8 +1,9 @@
  const UPDATE_INTERVAL_MS = 1000;
 
 const h1 = document.querySelector('h1');
-const div = document.querySelector('div');
+const div = document.getElementById('tests-progress');
 const [retryBtn, viewResultsBtn] = document.querySelectorAll('button');
+const terminalOutput = document.getElementById('terminal-output');
 
 const INITIAL_TESTS_COUNT = {
             pending: 0,
@@ -14,7 +15,7 @@ const INITIAL_TESTS_COUNT = {
 
 const POSSIBLE_STATUSES = ["passed", "failed", "pending", "running"];
 
-let openedAccordions = ['assist', 'products'];
+let openedAccordions = [];
 
 startPeriodicDataUpdate();
 
@@ -27,8 +28,9 @@ function startPeriodicDataUpdate(){
     requestInProcess = true;
     try{
         
-        const { data, complete } = await fetchData();
+        const { data, complete, logs } = await fetchData();
         showData(data);
+        showLogs(logs);
 
         if(complete) {
             clearInterval(interval);
@@ -119,6 +121,10 @@ function showData(data){
         displayTestCounts(h2, suiteTestsCount);
     }
 
+}
+
+function showLogs(logs){
+    if(logs) console.log(logs);
 }
 
 function createAccordion(tag, innerText){
