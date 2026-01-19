@@ -131,7 +131,18 @@ Updates can be made to the app-settings.json file in order to customize the menu
   "applicationName": "Playwright Menu", // Title of the page
   "defaultBrowsersToUse": [ // Browsers selected by default in the testing menu
     "chromium"
+  ],
+  "globalSettings": [
+    {
+      "name": "baseUrl",
+      "label": "Base URL",
+      "type": "text",
+      "defaultValue": "https://wisetrout.com",
+      "required": true
+    }
   ]
 }
 
 ```
+
+The "globalSettings" array defines different settings that will be shown in the menu and will apply to all tests. These can then be read and used in Playwright config file or inside the test files using the readSettingsSync() helper function. The default values will be available for change in the settings page.
