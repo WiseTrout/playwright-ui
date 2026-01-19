@@ -9,7 +9,29 @@
       "label": "Base URL",
       "type": "text",
       "defaultValue": "https://wisetrout.com",
-      "required": true
+      "required": true,
+      "showInSettingsPage": true
+    },
+    {
+      "name": "visualRegression",
+      "label": "Test Visual Regression",
+      "type": "radio",
+      "options": [
+        {
+          "value": "skip",
+          "label": "Skip"
+        },
+        {
+          "value": "test",
+          "label": "Run visual regression checks",
+          "defaultSelected": true
+        },
+        {
+          "value": "update",
+          "label": "Update snapshots"
+        }
+      ],
+      "showInSettingsPage": true
     }
   ]
 }

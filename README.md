@@ -138,11 +138,34 @@ Updates can be made to the app-settings.json file in order to customize the menu
       "label": "Base URL",
       "type": "text",
       "defaultValue": "https://wisetrout.com",
-      "required": true
+      "required": true,
+      "showInSettingsPage": true
+    },
+    {
+      "name": "dummySelect",
+      "label": "Dummy selection",
+      "type": "select",
+      "options": [
+        {
+          "value": "one",
+          "label": "Ichi"
+        },
+        {
+          "value": "two",
+          "label": "Ni",
+          "defaultSelected": true
+        },
+        {
+          "value": "three",
+          "label": "San"
+        }
+      ],
+      
+      "showInSettingsPage": true
     }
   ]
 }
 
 ```
 
-The "globalSettings" array defines different settings that will be shown in the menu and will apply to all tests. These can then be read and used in Playwright config file or inside the test files using the readSettingsSync() helper function. The default values will be available for change in the settings page.
+The "globalSettings" array defines different settings that will be shown in the menu and will apply to all tests. These can then be read and used in Playwright config file or inside the test files using the readSettingsSync() helper function. If the optional property "showInSettingsPage" is set to true, the default value of the setting will be available for change in the settings page. Multiple-choice inputs not supported for now.

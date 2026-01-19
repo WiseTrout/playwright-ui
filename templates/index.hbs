@@ -9,16 +9,10 @@
         </h2>
         <ul>
             {{#each globalSettings}}
-                <li>
-                    <h3>{{this.label}}</h3>
-                    <input 
-                    type="{{this.type}}" 
-                    value="{{this.defaultValue}}" 
-                    name="global--{{this.name}}"
-                    aria-label="{{this.label}}"
-                    {{#if this.required}} required {{/if}}
-                    >
-                </li>
+            <li>
+                <h3>{{this.label}}</h3>
+                {{> input input=this}}
+            </li>
             {{/each}}
             {{#each testSuites}}
                 <li>

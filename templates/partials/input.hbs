@@ -1,0 +1,30 @@
+{{#if input.options}}
+    {{#if input.isSelect}}
+        <select name="global--{{input.name}}" aria-label="{{input.label}}">
+            {{#each input.options}}
+             <option value="{{this.value}}" {{#if this.defaultSelected}} selected {{/if}}>{{this.label}}</option>
+            {{/each}}
+        </select>
+    {{else}}
+        {{#each input.options}}
+            <label>
+                <input
+                type="{{this.type}}"
+                value="{{this.value}}"
+                name="global--{{this.name}}"
+                {{#if this.defaultSelected}} checked {{/if}}
+                >
+                {{this.label}}
+            </label>
+            <br>
+        {{/each}}
+    {{/if}}
+{{else}}
+    <input 
+    type="{{input.type}}" 
+    value="{{input.defaultValue}}" 
+    name="global--{{input.name}}"
+    aria-label="{{input.label}}"
+    {{#if input.required}} required {{/if}}
+    >
+{{/if}}

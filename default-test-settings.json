@@ -1,6 +1,7 @@
 {
   "global": {
-    "baseUrl": "https://wisetrout.com"
+    "baseUrl": "https://wisetrout.com",
+    "visualRegression": "test"
   },
   "selectedBrowsers": [
     "chromium"
