@@ -1,0 +1,15 @@
+{
+  "applicationName": "Playwright UI",
+  "defaultBrowsersToUse": [
+    "chromium"
+  ],
+  "globalSettings": [
+    {
+      "name": "baseUrl",
+      "label": "Base URL",
+      "type": "text",
+      "defaultValue": "https://wisetrout.com",
+      "required": true
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+services:
+  tests-menu:
+    init: true
+    ipc: host
+    build: .
+    ports: 
+      - ${TESTS_MENU_PORT:-3000}:3000
+      - ${TESTS_RESULTS_PORT:-9323}:9323
+    environment:
+      - TESTS_MENU_PORT
+      - TESTS_RESULTS_PORT
+    security_opt:
+      - seccomp=seccomp_profile.json
+    volumes:
+      - type: bind
+        source: ./app.js
+        target: /app/app.js
+      - type: bind
+        source: ./tests
+        target: /app/tests
+      - type: bind
+        source: ./templates
+        target: /app/templates
+      - type: bind
+        source: ./public
+        target: /app/public
+      - type: bind
+        source: ./tests-data
+        target: /app/tests-data
+      - type: bind
+        source: ./helpers
+        target: /app/helpers
+      - type: bind
+        source: ./playwright.config.js
+        target: /app/playwright.config.js
+      - type: bind
+        source: ./app-settings.json
+        target: /app/app-settings.json
+      - type: bind
+        source: ./package.json
+        target: /app/package.json
+      - type: bind
+        source: ./package-lock.json
+        target: /app/package-lock.json
+      - type: bind
+        source: ./test-settings.json
+        target: /app/test-settings.json
+      - type: bind
+        source: ./default-test-settings.json
+        target: /app/default-test-settings.json

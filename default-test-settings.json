@@ -1,0 +1,9 @@
+{
+  "global": {
+    "baseUrl": "https://wisetrout.com"
+  },
+  "selectedBrowsers": [
+    "chromium"
+  ],
+  "testAllSuites": true
+}
