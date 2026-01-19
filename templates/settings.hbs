@@ -6,13 +6,10 @@
     <div>
         <h2>Default settings</h2>
         {{#each globalSettings}}
-            <h3>{{this.label}}</h3>
-            <input 
-                name="global--{{this.name}}"
-                type="{{this.type}}"
-                value="{{this.defaultValue}}"
-                aria-label="{{this.label}}"
-                >
+            {{#if this.showInSettingsPage}}
+                <h3>{{this.label}}</h3>
+                    {{> input input=this}}
+            {{/if}}
         {{/each}}
             
         <h2>
