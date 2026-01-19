@@ -23,7 +23,7 @@ let testSuites;
 let availableBrowsers;
 let appSettings;
 
-app.engine('hbs', engine({extname: '.hbs'}));
+app.engine('hbs', engine({extname: '.hbs', partialsDir: __dirname + '/templates/partials'}));
 app.set('view engine', 'hbs');
 app.set('views', './templates');
 app.use(express.static('public'));
@@ -50,11 +50,17 @@ app.get('/', async (_, res) => {
         name: browser,
         defaultChecked: appSettings.defaultBrowsersToUse.includes(browser)
     }))
-    
+
+    const globalSettings = appSettings.globalSettings.map(setting => {
+        if(!setting.options) return setting;
+        const newOptions = setting.options.map(option => ({...option, type: setting.type, name: setting.name}));
+        return {...setting, options: newOptions, isSelect: setting.type === "select"};
+    }
+    )
 
     res.render('index', {
         title: appSettings.applicationName, 
-        globalSettings: appSettings.globalSettings,
+        globalSettings,
         testSuites: menuCategories, 
         browsers: menuBrowsers
     });
@@ -69,7 +75,14 @@ app.get('/settings', (_, res) => {
         }
     })
 
-    res.render('settings', {globalSettings: appSettings.globalSettings, browsers});
+    const globalSettings = appSettings.globalSettings.map(setting => {
+        if(!setting.options) return setting;
+        const newOptions = setting.options.map(option => ({...option, type: setting.type, name: setting.name}));
+        return {...setting, options: newOptions, isSelect: setting.type === "select"};
+    }
+    )
+
+    res.render('settings', {globalSettings, browsers});
 
 });
 
@@ -273,7 +286,16 @@ function updateAppSettings(oldSettings, req){
 
     for(const key in req.body){
         if(key.includes('global--')){
-            newSettings.globalSettings.find(setting => setting.name === key.split('--')[1]).defaultValue = req.body[key];
+            const settingName = key.split('--')[1];
+            const setting = newSettings.globalSettings.find(setting => setting.name === settingName);
+            
+            if(setting.options){
+                setting.options.forEach(option => {
+                    option.defaultSelected = option.value === req.body[key] ? true : undefined;
+                })
+            }else{
+                setting.defaultValue = req.body[key];
+            }
             continue;
         }
         if(key.includes('browser--')){
