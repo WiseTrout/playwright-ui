@@ -2,7 +2,7 @@
 
 const h1 = document.querySelector('h1');
 const div = document.querySelector('div');
-const [retryBtn, viewResultsBtn] = document.querySelectorAll('button');
+const [retryBtn, viewResultsBtn, stopButton] = document.querySelectorAll('button');
 
 const INITIAL_TESTS_COUNT = {
             pending: 0,
@@ -14,9 +14,10 @@ const INITIAL_TESTS_COUNT = {
 
 const POSSIBLE_STATUSES = ["passed", "failed", "pending", "running"];
 
-let openedAccordions = ['assist', 'products'];
+const openedAccordions = [];
 
 startPeriodicDataUpdate();
+activateStopBtn();
 
 function startPeriodicDataUpdate(){
 
@@ -45,6 +46,17 @@ function startPeriodicDataUpdate(){
     }
     requestInProcess = false;
     }, UPDATE_INTERVAL_MS);
+
+    stopButton.onclick = () => {
+        h1.innerText = 'Stopping tests...';
+        
+        fetch('/stop-tests').then(() => {
+            h1.innerText = 'Tests stopped';
+            clearInterval(interval);
+            retryBtn.disabled = false;
+            viewResultsBtn.disabled = true;
+        });
+    }
 }
 
 async function fetchData(){

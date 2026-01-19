@@ -159,6 +159,12 @@ app.get('/get-tests-update', async (_, res) => {
     })
 })
 
+app.get('/stop-tests', async (_, res) => {
+    if(testsProcess) stopTests();
+    if(playwrightReportProcess) stopPlaywrightReport();
+    res.sendStatus(200);
+});
+
 loadAppInfo().then(({browsers, suites, settings}) => {
 
     availableBrowsers = browsers;
@@ -430,14 +436,19 @@ function launchTests(settingsObj){
             
             console.log(data);
             
-        })
+        });
 
         testsProcess.on('exit', () => {
             res()
-        })
+        });
 
-        testsProcess.on('error', (err) => rej(err))
-    });
+        testsProcess.on('error', (err) => rej(err));
+
+        testsProcess.on('close', (code, signal) => {
+            console.log(
+                `child process terminated due to receipt of signal ${signal}`);
+            });
+        });
 }
 
 function launchPlaywrightReport(){
