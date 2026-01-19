@@ -42,8 +42,6 @@ Pick a name for the test file, it must end in ".spec.js". For example, "my-new-t
 }
 ```
 
-```
-
 2) Writing the test
 
 The test file must be placed inside "/tests" and have the name we picked in step 1).
