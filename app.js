@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { createFileUploadPromise } from './helpers/file-upload-promise.js';
 import { clearLogs, logTests, readLogs } from './helpers/log-test.js';
+import process from 'process';
 
 console.log('Launching menu...');
 
@@ -96,9 +97,7 @@ app.get('/status', async (_, res) => {
 
 app.post('/run-tests', async (req, res) => {
 
-    if(playwrightReportProcess) stopPlaywrightReport();
-
-    if(testsProcess) stopTests();
+    killProcesses();
 
     testConsoleLogs = '';
 
@@ -166,8 +165,7 @@ app.get('/get-tests-update', async (_, res) => {
 })
 
 app.get('/stop-tests', async (_, res) => {
-    if(testsProcess) stopTests();
-    if(playwrightReportProcess) stopPlaywrightReport();
+    killProcesses();
     res.sendStatus(200);
 });
 
@@ -180,15 +178,6 @@ loadAppInfo().then(({browsers, suites, settings}) => {
     app.listen(3000, () => console.log(`Testing menu is available at http://localhost:${process.env.TESTS_MENU_PORT || 3000}`));
 })
 
-function stopTests(){
-    testsProcess.kill();
-    testsProcess = null;
-}
-
-function stopPlaywrightReport(){
-    playwrightReportProcess.kill();
-    playwrightReportProcess = null;
-}
 
 function getTestSettings(req, suitesList){
 
@@ -434,7 +423,7 @@ function launchTests(settingsObj){
 
         if(settingsObj.global.visualRegression === 'update') testSpawnOptions.push('--update-snapshots');
 
-        testsProcess = spawn('npx', testSpawnOptions);
+        testsProcess = spawn('npx', testSpawnOptions, {detached: true});
 
         testsProcess.stdout.setEncoding('utf-8');
 
@@ -447,21 +436,22 @@ function launchTests(settingsObj){
         });
 
         testsProcess.on('exit', () => {
-            res()
+            res();
         });
 
         testsProcess.on('error', (err) => rej(err));
 
-        testsProcess.on('close', (code, signal) => {
-            console.log(
-                `child process terminated due to receipt of signal ${signal}`);
-            });
+        testsProcess.on('close', (_, signal) => {
+            if(signal === 'SIGTERM') console.log('Tests stopped');
+            
         });
+
+    });
 }
 
 function launchPlaywrightReport(){
     return new Promise((res, rej) => {
-        playwrightReportProcess = spawn('npx',  ['playwright', 'show-report', '--host',  '0.0.0.0']);
+        playwrightReportProcess = spawn('npx',  ['playwright', 'show-report', '--host',  '0.0.0.0'], {detached: true});
         playwrightReportProcess.on('spawn', () => {
             res();
         })
@@ -469,6 +459,12 @@ function launchPlaywrightReport(){
         playwrightReportProcess.on('error', (err) => {
             rej(err)
         });
+
     });
+}
+
+function killProcesses(){
+    if(playwrightReportProcess && !playwrightReportProcess.signalCode) process.kill(-playwrightReportProcess.pid);
+    if(testsProcess && !testsProcess.signalCode) process.kill(-testsProcess.pid);
 }
 

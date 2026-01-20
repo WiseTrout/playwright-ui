@@ -173,7 +173,7 @@ form > ul:last-of-type {
     margin-top: 2rem;
 }
 
-.disabled {
+.disabled, button:disabled {
     opacity: 0.5;
     pointer-events: none;
     cursor: not-allowed;
