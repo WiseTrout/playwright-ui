@@ -27,22 +27,13 @@ export function clearLogs(){
 
 export function logTests(tests){
 
-
-    const valuesArray = [];
-    let sqlValues = [];
+    const writeLogsSql = `INSERT INTO ${TABLE_NAME} VALUES (?, ?, ?, ?, ?);`;
+    const statement = db.prepare(writeLogsSql);
 
     for(const test of tests){
-        valuesArray.push(`(?, ?, ?, ?, ?)`);
-        sqlValues = sqlValues.concat([test.suiteName, test.groupName, test.title, test.browser, test.status || 'pending']);
+        statement.run([test.suiteName, test.groupName, test.title, test.browser, test.status || 'pending']);
     }
-
-    const writeLogsSql = `
-        INSERT INTO ${TABLE_NAME} VALUES
-        ${valuesArray.join(', ')};
-    `;
-
-    const statement = db.prepare(writeLogsSql);
-    statement.run(...sqlValues);
+    
 }
 
 export function updateTestStatus({suiteName, groupName, title, browser, status}){
