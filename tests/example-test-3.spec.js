@@ -1,19 +1,22 @@
 import { expect } from '@playwright/test';
 import { test } from "./fixtures.js";
 import createDescribe from './lib/describe.js';
-
+import readSettingsSync from '../helpers/read-settings-sync.js';
 
 const describe = createDescribe("example-test-3.spec.js");
+const settings = readSettingsSync();
+const { visualRegression } = settings.global;
+const TEST_VR = visualRegression != 'skip';
 
-describe('Advanced tests', () => {
-    test('Page title', async ({ page }) => {
+describe('Basic visual regression', () => {
+    test('Homepage', async ({ page }) => {
         await page.goto('/');
-        await expect(page).toHaveTitle('What is this site? | Wise Trout');
+         if(TEST_VR) await expect(page).toHaveScreenshot('homepage.png');
     });
 
-    test('Page header', async ({page}) => {
-        await page.goto('/');
-        await expect(page.getByText('What is this site?')).toBeVisible();
+    test('Contact page', async ({page}) => {
+        await page.goto('/contact');
+        if(TEST_VR) await expect(page).toHaveScreenshot('contact.png');
     });
 
 });
