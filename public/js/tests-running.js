@@ -17,7 +17,6 @@ const POSSIBLE_STATUSES = ["passed", "failed", "pending", "running"];
 const openedAccordions = [];
 
 startPeriodicDataUpdate();
-activateStopBtn();
 
 function startPeriodicDataUpdate(){
 
@@ -36,6 +35,7 @@ function startPeriodicDataUpdate(){
             h1.innerText = 'Tests complete';
             retryBtn.disabled = false;
             viewResultsBtn.disabled = false;
+            stopButton.disabled = true;
         }
 
     }catch(err){
@@ -43,6 +43,7 @@ function startPeriodicDataUpdate(){
         clearInterval(interval);
         h1.innerText = 'Error while running tests';
         retryBtn.disabled = false;
+        stopButton.disabled = true;
     }
     requestInProcess = false;
     }, UPDATE_INTERVAL_MS);
@@ -55,6 +56,7 @@ function startPeriodicDataUpdate(){
             clearInterval(interval);
             retryBtn.disabled = false;
             viewResultsBtn.disabled = true;
+            window.location.href = `http://localhost:${stopButton.getAttribute('data-menu-port')}`;
         });
     }
 }

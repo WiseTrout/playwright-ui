@@ -37,6 +37,9 @@ describe('Even more advanced tests', () => {
         await page.goto('/');
         if(TEST_VR) await expect(page).toHaveScreenshot('homepage.png');
     });
+    test('Long test', async ({page}) => {
+        await page.waitForTimeout(5000);
+    });
 
 });
 
