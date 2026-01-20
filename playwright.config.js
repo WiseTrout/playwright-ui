@@ -30,7 +30,7 @@ if(testAllSuites){
 }else{
   testMatch = [];
   for(const suite of suites){
-    testMatch = [...testMatch, ...suite.testFileNames];
+    testMatch = [...testMatch, ...suite.testFiles];
   }
 }
 

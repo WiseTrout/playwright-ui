@@ -1,0 +1,6 @@
+{
+    "title": "Visual regression",
+    "testFiles": [
+        "example-test-3.spec.js"
+    ]
+}
