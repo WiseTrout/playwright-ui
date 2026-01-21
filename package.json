@@ -1,0 +1,21 @@
+{
+  "name": "Playwright UI",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^24.7.1",
+    "jshint": "^2.13.6"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.5.0",
+    "express": "^5.1.0",
+    "express-fileupload": "^1.5.2",
+    "express-handlebars": "^8.0.3"
+  }
+}
