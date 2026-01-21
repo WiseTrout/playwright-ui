@@ -2,8 +2,8 @@
 
 const h1 = document.querySelector('h1');
 const div = document.getElementById('tests-progress');
-const [retryBtn, viewResultsBtn] = document.querySelectorAll('button');
 const terminalOutput = document.getElementById('terminal-output');
+const [retryBtn, viewResultsBtn, stopButton] = document.querySelectorAll('button');
 
 const INITIAL_TESTS_COUNT = {
             pending: 0,
@@ -37,6 +37,7 @@ function startPeriodicDataUpdate(){
             h1.innerText = 'Tests complete';
             retryBtn.disabled = false;
             viewResultsBtn.disabled = false;
+            stopButton.disabled = true;
         }
 
     }catch(err){
@@ -44,9 +45,22 @@ function startPeriodicDataUpdate(){
         clearInterval(interval);
         h1.innerText = 'Error while running tests';
         retryBtn.disabled = false;
+        stopButton.disabled = true;
     }
     requestInProcess = false;
     }, UPDATE_INTERVAL_MS);
+
+    stopButton.onclick = () => {
+        h1.innerText = 'Stopping tests...';
+        
+        fetch('/stop-tests').then(() => {
+            h1.innerText = 'Tests stopped';
+            clearInterval(interval);
+            retryBtn.disabled = false;
+            viewResultsBtn.disabled = true;
+            window.location.href = `http://localhost:${stopButton.getAttribute('data-menu-port')}`;
+        });
+    }
 }
 
 async function fetchData(){
