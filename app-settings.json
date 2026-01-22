@@ -19,18 +19,25 @@
       "options": [
         {
           "value": "skip",
-          "label": "Skip"
+          "label": "Skip",
+          "defaultSelected": true
         },
         {
           "value": "test",
-          "label": "Run visual regression checks",
-          "defaultSelected": true
+          "label": "Run visual regression checks"
         },
         {
           "value": "update",
           "label": "Update snapshots"
         }
       ],
+      "showInSettingsPage": true
+    },
+    {
+      "name": "dummyCheckbox",
+      "label": "Dummy Checkbox",
+      "type": "checkbox",
+      "defaultSelected": false,
       "showInSettingsPage": true
     }
   ]

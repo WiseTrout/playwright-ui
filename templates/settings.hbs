@@ -7,18 +7,14 @@
         <h2>Default settings</h2>
         {{#each globalSettings}}
             {{#if this.showInSettingsPage}}
-                <h3>{{this.label}}</h3>
                     {{> input input=this}}
             {{/if}}
         {{/each}}
-            
-        <h2>
-            Default list of browsers to test:
-        </h2>
-        <button type="button" onclick="selectAll(this.parentNode)">Select all</button>
-        <button type="button" onclick="selectNone(this.parentNode)">Select none</button>
-        <br>
-            {{#each browsers}}
+
+        <h3>
+                Browsers to test
+            </h3>
+                {{#each browsers}}
                 <label>
                     <input 
                     type="checkbox" 
