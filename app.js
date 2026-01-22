@@ -181,7 +181,9 @@ function getTestSettings(req, suitesList){
     for(let key in req.body){
 
         if(key.split('--')[0] === 'global'){
-            testsSettings.global[key.split('--')[1]] = req.body[key];
+            const settingName = key.split('--')[1];
+            const inputType = appSettings.globalSettings.find(setting => setting.name === settingName).type;
+            testsSettings.global[settingName] = inputType === "checkbox" || req.body[key];
             continue;
         }
 
