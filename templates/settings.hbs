@@ -25,6 +25,23 @@
                 <br>
             {{/each}}
     </div>
+
+    {{#if fileUploads}}
+    <div>
+        <h2>Upload files</h2>
+        {{#each fileUploads}}
+            <label>
+                {{this.label}}
+                <input
+                    type="file"
+                    accept="{{this.accept}}"
+                    name="file--{{this.name}}"
+                >
+            </label>
+        {{/each}}
+    </div>
+    {{/if}}
+
     <ul>
 
         <button>Submit settings</button>

@@ -73,8 +73,9 @@ app.get('/settings', (_, res) => {
     })
 
     const globalSettings = getGlobalSettingsToDisplay(appSettings.globalSettings);
+    const fileUploads = appSettings.fileUploads;
 
-    res.render('settings', {globalSettings, browsers});
+    res.render('settings', {globalSettings, browsers, fileUploads});
 
 });
 
@@ -122,10 +123,9 @@ app.post('/update-settings', async (req, res) => {
 
         for(const fileName in req.files){
 
-            const fileMachineName = fileName.split('--')[1];
-            const extension = '.' + req.files[fileName].name.split('.')[1];
-
-            const uploadPath = path.join(__dirname, 'tests-data', fileMachineName + extension);
+            const fileUploadName = fileName.split('--')[1];
+            const fileUploadSettings = appSettings.fileUploads.find(fileUpload => fileUpload.name === fileUploadName);
+            const uploadPath = __dirname + fileUploadSettings.savePath;
             const fileUploadPromise = createFileUploadPromise(req.files[fileName], uploadPath);
 
             promises.push(fileUploadPromise);

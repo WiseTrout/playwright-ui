@@ -40,5 +40,13 @@
       "defaultSelected": false,
       "showInSettingsPage": true
     }
+  ],
+  "fileUploads": [
+    {
+      "name": "dummyFileInput",
+      "label": "Some more tests info",
+      "accept": "txt",
+      "savePath": "/tests-data/dummy-data.txt"
+    }
   ]
 }
