@@ -5,20 +5,19 @@
 <a href="/">⬅️ Back to tests</a>
     <div>
         <h2>Default settings</h2>
+        <ul>
         {{#each globalSettings}}
+        <li>
             {{#if this.showInSettingsPage}}
-                <h3>{{this.label}}</h3>
                     {{> input input=this}}
             {{/if}}
+            </li>
         {{/each}}
-            
-        <h2>
-            Default list of browsers to test:
-        </h2>
-        <button type="button" onclick="selectAll(this.parentNode)">Select all</button>
-        <button type="button" onclick="selectNone(this.parentNode)">Select none</button>
-        <br>
-            {{#each browsers}}
+        </ul>
+        <h3>
+                Browsers to test
+            </h3>
+                {{#each browsers}}
                 <label>
                     <input 
                     type="checkbox" 
@@ -29,6 +28,23 @@
                 <br>
             {{/each}}
     </div>
+
+    {{#if fileUploads}}
+    <div>
+        <h2>Upload files</h2>
+        {{#each fileUploads}}
+            <label>
+                {{this.label}}
+                <input
+                    type="file"
+                    accept="{{this.accept}}"
+                    name="file--{{this.name}}"
+                >
+            </label>
+        {{/each}}
+    </div>
+    {{/if}}
+
     <ul>
 
         <button>Submit settings</button>

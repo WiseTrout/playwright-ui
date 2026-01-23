@@ -1,17 +1,28 @@
-{{#if input.options}}
+{{#if input.isCheckbox}}
+    <label>
+        <input 
+        type="checkbox"
+        {{#if input.defaultSelected}} checked {{/if}}
+        name="{{input.name}}"
+        >
+        {{input.label}}
+    </label>
+{{else}}
+    <h3>{{input.label}}</h3>
     {{#if input.isSelect}}
-        <select name="global--{{input.name}}" aria-label="{{input.label}}">
+        <select name="{{input.name}}" aria-label="{{input.label}}">
             {{#each input.options}}
-             <option value="{{this.value}}" {{#if this.defaultSelected}} selected {{/if}}>{{this.label}}</option>
+            <option value="{{this.value}}" {{#if this.defaultSelected}} selected {{/if}}>{{this.label}}</option>
             {{/each}}
         </select>
-    {{else}}
+    {{/if}}
+    {{#if input.isRadio}}
         {{#each input.options}}
             <label>
                 <input
-                type="{{this.type}}"
+                type="radio"
                 value="{{this.value}}"
-                name="global--{{this.name}}"
+                name="{{this.name}}"
                 {{#if this.defaultSelected}} checked {{/if}}
                 >
                 {{this.label}}
@@ -19,12 +30,15 @@
             <br>
         {{/each}}
     {{/if}}
-{{else}}
-    <input 
-    type="{{input.type}}" 
-    value="{{input.defaultValue}}" 
-    name="global--{{input.name}}"
-    aria-label="{{input.label}}"
-    {{#if input.required}} required {{/if}}
-    >
+    
+    {{#if input.isSimple}}
+        <input 
+        type="{{input.type}}" 
+        value="{{input.defaultValue}}" 
+        name="{{input.name}}"
+        aria-label="{{input.label}}"
+        {{#if input.required}} required {{/if}}
+        >
+    {{/if}}
+
 {{/if}}

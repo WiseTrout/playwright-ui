@@ -53,12 +53,7 @@ app.get('/', async (_, res) => {
         defaultChecked: appSettings.defaultBrowsersToUse.includes(browser)
     }))
 
-    const globalSettings = appSettings.globalSettings.map(setting => {
-        if(!setting.options) return setting;
-        const newOptions = setting.options.map(option => ({...option, type: setting.type, name: setting.name}));
-        return {...setting, options: newOptions, isSelect: setting.type === "select"};
-    }
-    )
+    const globalSettings = getGlobalSettingsToDisplay(appSettings.globalSettings);
 
     res.render('index', {
         title: appSettings.applicationName, 
@@ -77,14 +72,10 @@ app.get('/settings', (_, res) => {
         }
     })
 
-    const globalSettings = appSettings.globalSettings.map(setting => {
-        if(!setting.options) return setting;
-        const newOptions = setting.options.map(option => ({...option, type: setting.type, name: setting.name}));
-        return {...setting, options: newOptions, isSelect: setting.type === "select"};
-    }
-    )
+    const globalSettings = getGlobalSettingsToDisplay(appSettings.globalSettings);
+    const fileUploads = appSettings.fileUploads;
 
-    res.render('settings', {globalSettings, browsers});
+    res.render('settings', {globalSettings, browsers, fileUploads});
 
 });
 
@@ -132,10 +123,9 @@ app.post('/update-settings', async (req, res) => {
 
         for(const fileName in req.files){
 
-            const fileMachineName = fileName.split('--')[1];
-            const extension = '.' + req.files[fileName].name.split('.')[1];
-
-            const uploadPath = path.join(__dirname, 'tests-data', fileMachineName + extension);
+            const fileUploadName = fileName.split('--')[1];
+            const fileUploadSettings = appSettings.fileUploads.find(fileUpload => fileUpload.name === fileUploadName);
+            const uploadPath = __dirname + fileUploadSettings.savePath;
             const fileUploadPromise = createFileUploadPromise(req.files[fileName], uploadPath);
 
             promises.push(fileUploadPromise);
@@ -191,7 +181,9 @@ function getTestSettings(req, suitesList){
     for(let key in req.body){
 
         if(key.split('--')[0] === 'global'){
-            testsSettings.global[key.split('--')[1]] = req.body[key];
+            const settingName = key.split('--')[1];
+            const inputType = appSettings.globalSettings.find(setting => setting.name === settingName).type;
+            testsSettings.global[settingName] = inputType === "checkbox" || req.body[key];
             continue;
         }
 
@@ -304,6 +296,10 @@ function updateAppSettings(oldSettings, req){
         }
     }
 
+    newSettings.globalSettings
+    .filter(setting => setting.type === "checkbox")
+    .forEach(setting => setting.defaultSelected = !!req['global--' + setting.name]);
+
     newSettings.defaultBrowsersToUse = checkedBrowsers;
     
     return newSettings;
@@ -348,20 +344,23 @@ function enableAllTests(){
 async function getTestFilesInfo(){
 
     return new Promise((res, rej) => {
+        let json = '';
         const process = spawn('npx', ['playwright', 'test', '--list', '--reporter=json']);
 
         process.stdout.setEncoding('utf-8');
 
-        process.stdout.on('data', (json) => {
-            
-            const data = JSON.parse(json);
-            res(data.suites);
-            
+        process.stdout.on('data', (data) => {
+            json += data;
         })
 
         process.on('error', (err) => {
             rej(err);
         })
+
+        process.on('close', () => {
+            const data = JSON.parse(json);
+            data.errors.length ? rej(data.errors) : res(data.suites);
+        });
 
     });
 }
@@ -464,7 +463,23 @@ function launchPlaywrightReport(){
 }
 
 function killProcesses(){
-    if(playwrightReportProcess && !playwrightReportProcess.signalCode) process.kill(-playwrightReportProcess.pid);
-    if(testsProcess && !testsProcess.signalCode) process.kill(-testsProcess.pid);
+    if(playwrightReportProcess && !playwrightReportProcess.signalCode && playwrightReportProcess.exitCode === null) process.kill(-playwrightReportProcess.pid);
+    if(testsProcess && !testsProcess.signalCode && playwrightReportProcess.exitCode === null) process.kill(-testsProcess.pid);
+}
+
+function getGlobalSettingsToDisplay(globalSettings){
+
+    const COMPLEX_INPUT_TYPES = ['select', 'checkbox', 'radio'];
+
+    return globalSettings.map(setting => {
+        const newSetting = {... setting};
+        if(setting.options) newSetting.options = setting.options.map(option => ({...option, type: setting.type, name: 'global--' + setting.name}));
+        for(const type of COMPLEX_INPUT_TYPES){
+            if(setting.type === type) newSetting['is' + type[0].toUpperCase() + type.slice(1)] = true;
+        }
+        newSetting.isSimple = !COMPLEX_INPUT_TYPES.includes(setting.type);
+        newSetting.name = 'global--' + setting.name;
+        return newSetting;
+    });
 }
 

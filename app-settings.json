@@ -19,12 +19,12 @@
       "options": [
         {
           "value": "skip",
-          "label": "Skip"
+          "label": "Skip",
+          "defaultSelected": true
         },
         {
           "value": "test",
-          "label": "Run visual regression checks",
-          "defaultSelected": true
+          "label": "Run visual regression checks"
         },
         {
           "value": "update",
@@ -32,6 +32,21 @@
         }
       ],
       "showInSettingsPage": true
+    },
+    {
+      "name": "dummyCheckbox",
+      "label": "Dummy Checkbox",
+      "type": "checkbox",
+      "defaultSelected": false,
+      "showInSettingsPage": true
+    }
+  ],
+  "fileUploads": [
+    {
+      "name": "dummyFileInput",
+      "label": "Some more tests info",
+      "accept": "txt",
+      "savePath": "/tests-data/dummy-data.txt"
     }
   ]
 }

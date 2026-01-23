@@ -5,15 +5,35 @@
 <a href="/settings">⚙️ Update settings</a>
     <div>
         <h2>
-            Tests:
+            Global settings:
         </h2>
         <ul>
             {{#each globalSettings}}
             <li>
-                <h3>{{this.label}}</h3>
                 {{> input input=this}}
             </li>
             {{/each}}
+            <h3>
+                Browsers to test
+            </h3>
+                {{#each browsers}}
+                <label>
+                    <input 
+                    type="checkbox" 
+                    name="browser--{{this.name}}" 
+                    {{#if this.defaultChecked}}checked{{/if}}>
+                    {{this.name}} 
+                </label>
+                <br>
+            {{/each}}
+            
+        </ul>
+    </div>
+    <div>
+        <h2>
+            Tests:
+        </h2>
+        <ul>
             {{#each testSuites}}
                 <li>
                 
@@ -34,24 +54,6 @@
                 </li>
                 {{/each}}
         </ul>
-    </div>
-    <div>
-        <h2>
-            Browsers:
-        </h2>
-        <button type="button"  onclick="selectAll(this.parentNode)">Select all</button>
-        <button type="button"  onclick="selectNone(this.parentNode)">Select none</button>
-        <br>
-            {{#each browsers}}
-                <label>
-                    <input 
-                    type="checkbox" 
-                    name="browser--{{this.name}}" 
-                    {{#if this.defaultChecked}}checked{{/if}}>
-                    {{this.name}} 
-                </label>
-                <br>
-            {{/each}}
     </div>
     <ul>
 

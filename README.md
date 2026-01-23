@@ -163,9 +163,18 @@ Updates can be made to the app-settings.json file in order to customize the menu
       
       "showInSettingsPage": true
     }
+  ],
+  "fileUploads": [
+     {
+      "name": "dummyFileInput",
+      "label": "Some more tests info",
+      "accept": "txt",
+      "savePath": "/tests-data/dummy-data.txt"
+    }
   ]
 }
 
 ```
 
 The "globalSettings" array defines different settings that will be shown in the menu and will apply to all tests. These can then be read and used in Playwright config file or inside the test files using the readSettingsSync() helper function. If the optional property "showInSettingsPage" is set to true, the default value of the setting will be available for change in the settings page. Multiple-choice inputs not supported for now.
+The optional "fileUploads" array defines files that can be uploaded from the settings menu and later used.
