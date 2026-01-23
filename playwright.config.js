@@ -5,7 +5,7 @@ import fs from 'fs';
 const settingsJson = fs.readFileSync('test-settings.json', 'utf-8');
 const settingsObj = JSON.parse(settingsJson);
 
-const { selectedBrowsers, testAllSuites, suites, sequential } = settingsObj;
+const { selectedBrowsers, testAllSuites, suites, sequential, videoWidth, videoHeight } = settingsObj;
 
 const workers = sequential ? 1 : undefined;
 
@@ -58,7 +58,7 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     video: {
-      size: {width: 1920, height: 1080},
+      size: {width: videoWidth || 1920, height: videoHeight || 1080},
       mode: 'on'
     }
   },
