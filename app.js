@@ -344,20 +344,23 @@ function enableAllTests(){
 async function getTestFilesInfo(){
 
     return new Promise((res, rej) => {
+        let json = '';
         const process = spawn('npx', ['playwright', 'test', '--list', '--reporter=json']);
 
         process.stdout.setEncoding('utf-8');
 
-        process.stdout.on('data', (json) => {
-            
-            const data = JSON.parse(json);
-            res(data.suites);
-            
+        process.stdout.on('data', (data) => {
+            json += data;
         })
 
         process.on('error', (err) => {
             rej(err);
         })
+
+        process.on('close', () => {
+            const data = JSON.parse(json);
+            data.errors.length ? rej(data.errors) : res(data.suites);
+        });
 
     });
 }
@@ -460,8 +463,8 @@ function launchPlaywrightReport(){
 }
 
 function killProcesses(){
-    if(playwrightReportProcess && !playwrightReportProcess.signalCode) process.kill(-playwrightReportProcess.pid);
-    if(testsProcess && !testsProcess.signalCode) process.kill(-testsProcess.pid);
+    if(playwrightReportProcess && !playwrightReportProcess.signalCode && playwrightReportProcess.exitCode === null) process.kill(-playwrightReportProcess.pid);
+    if(testsProcess && !testsProcess.signalCode && playwrightReportProcess.exitCode === null) process.kill(-testsProcess.pid);
 }
 
 function getGlobalSettingsToDisplay(globalSettings){

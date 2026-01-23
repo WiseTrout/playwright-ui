@@ -5,12 +5,15 @@
 <a href="/">⬅️ Back to tests</a>
     <div>
         <h2>Default settings</h2>
+        <ul>
         {{#each globalSettings}}
+        <li>
             {{#if this.showInSettingsPage}}
                     {{> input input=this}}
             {{/if}}
+            </li>
         {{/each}}
-
+        </ul>
         <h3>
                 Browsers to test
             </h3>
