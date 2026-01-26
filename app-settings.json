@@ -46,6 +46,13 @@
       "type": "number",
       "defaultValue": 1020,
       "showInSettingsPage": true
+    },
+    {
+      "name": "dummyCheckbox",
+      "label": "Dummy checkbox",
+      "type": "checkbox",
+      "defaultSelected": true,
+      "showInSettingsPage": true
     }
   ],
   "fileUploads": [

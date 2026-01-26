@@ -183,7 +183,16 @@ function getTestSettings(req, suitesList){
         if(key.split('--')[0] === 'global'){
             const settingName = key.split('--')[1];
             const inputType = appSettings.globalSettings.find(setting => setting.name === settingName).type;
-            testsSettings.global[settingName] = inputType === "checkbox" || req.body[key];
+            switch(inputType){
+                case "checkbox":
+                    testsSettings.global[settingName] = true;
+                    break;
+                case "number":
+                    testsSettings.global[settingName] = +req.body[key];
+                    break;
+                default: 
+                    testsSettings.global[settingName] = req.body[key];
+            }
             continue;
         }
 
@@ -281,14 +290,23 @@ function updateAppSettings(oldSettings, req){
         if(key.includes('global--')){
             const settingName = key.split('--')[1];
             const setting = newSettings.globalSettings.find(setting => setting.name === settingName);
-            
+
             if(setting.options){
                 setting.options.forEach(option => {
                     option.defaultSelected = option.value === req.body[key] ? true : undefined;
-                })
-            }else{
-                setting.defaultValue = req.body[key];
+                });
+
+                continue;
             }
+            
+            if(setting.type === "checkbox") continue;
+
+            if(setting.type === "number"){
+                setting.defaultValue = +req.body[key];
+                continue;
+            }
+
+            setting.defaultValue = req.body[key];
             continue;
         }
         if(key.includes('browser--')){
@@ -298,7 +316,9 @@ function updateAppSettings(oldSettings, req){
 
     newSettings.globalSettings
     .filter(setting => setting.type === "checkbox")
-    .forEach(setting => setting.defaultSelected = !!req['global--' + setting.name]);
+    .forEach(setting => {
+        setting.defaultSelected = req.body['global--' + setting.name] === 'on';
+    });
 
     newSettings.defaultBrowsersToUse = checkedBrowsers;
     

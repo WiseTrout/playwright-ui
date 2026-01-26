@@ -51,3 +51,6 @@ services:
       - type: bind
         source: ./tests-lib
         target: /app/tests-lib
+      - type: bind
+        source: ./test-hooks
+        target: /app/test-hooks
