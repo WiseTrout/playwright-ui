@@ -1,8 +1,8 @@
 import { test as base } from '@playwright/test';
 import { checkIfAllTestsArePending, updateTestStatus } from '../helpers/log-test';
 import readSettingsSync from '../helpers/read-settings-sync';
-import beforeEach from '../tests/lib/before-each';
-import afterEach from '../tests/lib/after-each';
+import beforeEach from '../test-hooks/before-each.js';
+import afterEach from '../test-hooks/after-each.js';
 
 
 const settings = readSettingsSync();
