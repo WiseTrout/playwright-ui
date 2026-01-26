@@ -1,6 +1,8 @@
 import { test as base } from '@playwright/test';
 import { checkIfAllTestsArePending, updateTestStatus } from '../helpers/log-test';
 import readSettingsSync from '../helpers/read-settings-sync';
+import beforeEach from '../tests/lib/before-each';
+import afterEach from '../tests/lib/after-each';
 
 
 const settings = readSettingsSync();
@@ -38,8 +40,12 @@ export const test =  base.extend({
 
         logTestStart(testLogsInfo);
 
+        await beforeEach({page}, use, testInfo);
+
         // Run the test
         await use();
+
+        await afterEach({page}, use, testInfo);
 
         logTestEnd(testLogsInfo, testInfo);
 

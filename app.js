@@ -359,7 +359,12 @@ async function getTestFilesInfo(){
 
         process.on('close', () => {
             const data = JSON.parse(json);
-            data.errors.length ? rej(data.errors) : res(data.suites);
+            if(data.errors.length){
+                console.log(data.errors);
+                rej();
+            }else{
+                res(data.suites);
+            }
         });
 
     });

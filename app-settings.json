@@ -34,13 +34,6 @@
       "showInSettingsPage": true
     },
     {
-      "name": "dummyCheckbox",
-      "label": "Dummy Checkbox",
-      "type": "checkbox",
-      "defaultSelected": false,
-      "showInSettingsPage": true
-    },
-    {
       "name": "videoWidth",
       "label": "Video width",
       "type": "number",
