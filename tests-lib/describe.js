@@ -1,5 +1,5 @@
-import readSettingsSync from "../../helpers/read-settings-sync";
-import { test } from "../fixtures";
+import readSettingsSync from "../helpers/read-settings-sync";
+import { test } from "./fixtures";
 
 
 export default function createDescribe(filename){

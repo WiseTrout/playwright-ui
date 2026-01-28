@@ -6,13 +6,68 @@ This repository allows to configure and show a Playwright testing menu in the br
 
 ## Usage
 
+To begin, copy the contents of /example-app into your directory.
+
+### App settings
+
+app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /tests-data/available-projects.json). 
+
+The property "globalSettings" is an array of inputs that will be shown in menu and applied to all tests. These can be accessed inside the test files:
+```
+import readSettingsSync from '../helpers/read-settings-sync.js';
+const settings = readSettingsSync();
+const { baseUrl } = settings.global;
+```
+
+If a global setting has "showInSettingsPage" set to true, you will be able to update its default value via the /settings page.
+
+The "fileUploads" array is a list of files that can be uploaded via the /settings page to be used later:
+
+```
+  "fileUploads": [
+    {
+      "name": "dummyFileInput",
+      "label": "Some more tests info",
+      "accept": "txt",
+      "savePath": "/tests-data/dummy-data.txt"
+    }
+  ]
+```
+### Setting environment variables
+
+You can create a .env file and set new values inside it: TEST_MENU_PORT and TEST_RESULTS_PORT to change the ports that serve the menu and the test results. This file can also be used to pass secrets and additional settings to the container:
+
+.env:
+
+```
+MY_SECRET="hello-world"
+TESTS_MENU_PORT=3001
+TESTS_RESULTS_PORT=3002
+
+```
+
+compose.yaml:
+
+```
+
+services:
+    my-tests:
+      environment:
+        - MY_SECRET
+        - TESTS_MENU_PORT
+        - TESTS_RESULTS_PORT
+
+```
+
+*Note*: changes to .env require container restart.
+
 ### Developing tests
 
 #### Creating new test suite
 
-1) To begin, one must create a new folder inside /test-suites and give this folder the machine name of the suite. For example, /test-suites/my-new-suite.
+1) To begin, create a new folder inside /test-suites and give this folder the machine name of the suite. For example, /test-suites/my-new-suite.
 
-2) Inside the folder one must create a file named suite-metadata.json with the description of the suite:
+2) Inside the folder create a file named suite-metadata.json with the description of the suite:
 
 ```
 {
@@ -48,13 +103,13 @@ The test file must be placed inside "/tests" and have the name we picked in step
 
 All tests must be grouped, these will be the test categories that we see in the menu. When there are several test files in one suite, all the test groups across all files will be concatenated and shown as one list under that suite name. To group tests inside a test file, one must call the createDescribe() function and pass the file name to it. The returned value will be a function that can be used the same way that a test.describe() function would. The difference is that behind the scenes, this new function reads the test settings and filters out the categories we must skip when we launch the tests. 
 
-The separate tests inside of each group must be registered using the test() function. *Important*: this function must be imported from "./fixtures.js", *not* directly from Playwright. The reason is that the fixture adds test progress logging.
+The separate tests inside of each group must be registered using the test() function. *Important*: this function must be imported from "../tests-lib/fixtures.js", *not* directly from Playwright. The reason is that the fixture adds test progress logging.
 
 Example:
 
 ```
-import { test } from "./fixtures.js";
-import createDescribe from './lib/describe.js';
+import { test } from "../tests-lib/fixtures.js";
+import createDescribe from '../tests-lib/describe.js';
 
 const describe = createDescribe("my-new-test.spec.js");
 
@@ -70,6 +125,10 @@ describe('category 1', () => {
 
 ```
 
+3) Optional: add beforeEach() and afterEach() functions:
+
+If you want to add a beforeEach function to run before every one of your tests or an afterEach function to run after each test, you can add this logic inside the functions in /test-hooks/before-each.js and /test-hooks/after-each.js.
+
 ### Running tests
 
 To launch the menu for the first time, one must create a Docker container for the tests:
@@ -77,8 +136,6 @@ To launch the menu for the first time, one must create a Docker container for th
 ```
 docker-compose up --build
 ```
-
-This will take a while to complete.
 
 To stop the container:
 
@@ -95,86 +152,3 @@ docker-compose up
 After the container has been created, the testing menu will be available at 'http://localhost:3000' (or a different port, see "updating settings" section) in the browser. Select the necessary settings and click on "run tests". The page will show how the tests are progressing, which ones are pending (⏸️), running (▶️), passed (✅) or failed (❌).
 
 Once the tests are done, you can click on "view test results". You will be redirected to http://localhost:9323 (or whatever port has been set in settings), where the tests report is served with additional details about how the tests went. To run new tests, go back to 'http://localhost:3000'.
-
-
-### Updating settings
-
-By default, the menu is served on port 3000 and the results on port 9323. To change these set new values inside ".env": TEST_MENU_PORT and TEST_RESULTS_PORT. This file can also be used to pass secrets and additional settings to the container:
-
-.env:
-
-```
-MY_SECRET="hello-world"
-TESTS_MENU_PORT=3001
-TESTS_RESULTS_PORT=3002
-
-```
-
-compose.yaml:
-
-```
-
-services:
-    environment:
-      - MY_SECRET
-      - TESTS_MENU_PORT
-      - TESTS_RESULTS_PORT
-
-```
-
-*Note*: changes to .env require container restart.
-
-Updates can be made to the app-settings.json file in order to customize the menu:
-
-```
-{
-  "applicationName": "Playwright Menu", // Title of the page
-  "defaultBrowsersToUse": [ // Browsers selected by default in the testing menu
-    "chromium"
-  ],
-  "globalSettings": [
-    {
-      "name": "baseUrl",
-      "label": "Base URL",
-      "type": "text",
-      "defaultValue": "https://wisetrout.com",
-      "required": true,
-      "showInSettingsPage": true
-    },
-    {
-      "name": "dummySelect",
-      "label": "Dummy selection",
-      "type": "select",
-      "options": [
-        {
-          "value": "one",
-          "label": "Ichi"
-        },
-        {
-          "value": "two",
-          "label": "Ni",
-          "defaultSelected": true
-        },
-        {
-          "value": "three",
-          "label": "San"
-        }
-      ],
-      
-      "showInSettingsPage": true
-    }
-  ],
-  "fileUploads": [
-     {
-      "name": "dummyFileInput",
-      "label": "Some more tests info",
-      "accept": "txt",
-      "savePath": "/tests-data/dummy-data.txt"
-    }
-  ]
-}
-
-```
-
-The "globalSettings" array defines different settings that will be shown in the menu and will apply to all tests. These can then be read and used in Playwright config file or inside the test files using the readSettingsSync() helper function. If the optional property "showInSettingsPage" is set to true, the default value of the setting will be available for change in the settings page. Multiple-choice inputs not supported for now.
-The optional "fileUploads" array defines files that can be uploaded from the settings menu and later used.

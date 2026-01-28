@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
-import { test } from "./fixtures.js";
-import createDescribe from './lib/describe.js';
+import { test } from '../tests-lib/fixtures.js';
+import createDescribe from '../tests-lib/describe.js';
 
 const describe = createDescribe("example-test-1.spec.js");
 
