@@ -50,6 +50,28 @@ h3 {
     font-weight: 600;
 }
 
+header form{
+    background: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+header menu{
+    list-style: none;
+    display: flex;
+    gap: 10px;
+}
+
+header menu button, header menu a{
+    background: none;
+    padding: 0;
+    color: #0351a0;
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+
 /* Form container */
 form {
     max-width: 900px;
@@ -129,7 +151,7 @@ input[type="file"] {
 }
 
 /* Buttons */
-button {
+button, .button{
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
     font-weight: 600;

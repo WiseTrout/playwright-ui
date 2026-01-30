@@ -1,9 +1,26 @@
+
+
+<header>
+    <menu>
+        <li>
+            <a href="/settings">⚙️ Update settings</a>
+        </li>
+        {{#if showLogoutButton}}
+        <li>
+            {{> logout-button csrfToken=csrfToken}}
+        </li>
+        {{/if}}
+    </menu>
+</header>
+
+
 <h1>
     {{title}} menu
 </h1>
+
 <form action="/run-tests" method="post" enctype="multipart/form-data">
-<a href="/settings">⚙️ Update settings</a>
-<a id="logout" href="/login">🔒 Log out</a>
+
+
     <div>
         <h2>
             Global settings:
@@ -61,7 +78,7 @@
         <button>Run tests</button>
     </ul>
 
-    
+    <input type="hidden" value="{{csrfToken}}" name="csrfToken">
 
 </form>
 

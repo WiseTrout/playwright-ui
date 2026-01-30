@@ -10,9 +10,8 @@ import { createFileUploadPromise } from './helpers/file-upload-promise.js';
 import { clearLogs, logTests, readLogs } from './helpers/log-test.js';
 import process from 'process';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import cookieParser from 'cookie-parser';
 import session from 'express-session';
+import { csrfSync } from "csrf-sync";
 
 console.log('Launching menu...');
 
@@ -34,7 +33,20 @@ app.set('view engine', 'hbs');
 app.set('views', './templates');
 app.use(express.static('public'));
 
-if(process.env.SESSION_SECRET){ 
+
+
+app.use(express.urlencoded());
+
+app.use(fileUpload());
+
+if(process.env.HASHED_PASSWORD){ 
+
+    const { csrfSynchronisedProtection } = csrfSync(
+        {
+            getTokenFromRequest: (req) => req.body["csrfToken"]
+        }
+    );
+
     app.use(session({
         resave: false,
         saveUninitialized: false,
@@ -43,13 +55,14 @@ if(process.env.SESSION_SECRET){
             maxAge: +process.env.SESSION_COOKIE_MAX_AGE
         }
     }));
-}
 
-app.use(express.urlencoded());
+    app.use(csrfSynchronisedProtection);
 
-app.use(fileUpload());
+    app.use((req, res, next) => {
+        res.locals.csrfToken = req.csrfToken();
+        next();
+    })
 
-if(process.env.USERNAME) {
     app.get('/login', async (_, res) => {
         res.render('login');
     });
@@ -73,7 +86,7 @@ if(process.env.USERNAME) {
     });
 }
 
-app.get('/', authenticationMiddleware,  async (_, res) => {
+app.get('/', authenticationMiddleware,  async (req, res) => {
 
     
     const menuCategories = testSuites.map(suite => {
@@ -98,7 +111,8 @@ app.get('/', authenticationMiddleware,  async (_, res) => {
         title: appSettings.applicationName, 
         globalSettings,
         testSuites: menuCategories, 
-        browsers: menuBrowsers
+        browsers: menuBrowsers,
+        showLogoutButton: !!process.env.HASHED_PASSWORD
     });
 });
 
@@ -107,7 +121,8 @@ app.get('/settings', authenticationMiddleware, (_, res) => {
     const browsers = availableBrowsers.map(browser => {
         return {
             name: browser,
-            defaultChecked: appSettings.defaultBrowsersToUse.includes(browser)
+            defaultChecked: appSettings.defaultBrowsersToUse.includes(browser),
+            showLogoutButton: !!process.env.HASHED_PASSWORD
         }
     })
 
@@ -524,7 +539,7 @@ function getGlobalSettingsToDisplay(globalSettings){
 
 function authenticationMiddleware(req, res, next){
 
-    if(!process.env.USERNAME){
+    if(!process.env.HASHED_PASSWORD){
         next();
         return;
     }

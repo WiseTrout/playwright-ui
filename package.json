@@ -15,11 +15,10 @@
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.5.0",
-    "cookie-parser": "^1.4.7",
+    "csrf-sync": "^4.2.1",
     "express": "^5.1.0",
     "express-fileupload": "^1.5.2",
     "express-handlebars": "^8.0.3",
-    "express-session": "^1.19.0",
-    "jsonwebtoken": "^9.0.3"
+    "express-session": "^1.19.0"
   }
 }

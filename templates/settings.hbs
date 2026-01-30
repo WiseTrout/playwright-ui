@@ -1,8 +1,21 @@
+<header>
+    <menu>
+        <li>
+            <a href="/">⬅️ Back to tests</a>
+        </li>
+        {{#if showLogoutButton}}
+        <li>
+            {{> logout-button csrfToken=csrfToken}}
+        </li>
+        {{/if}}
+    </menu>
+</header>
+
 <h1>
     Settings
 </h1>
 <form action="/update-settings" method="post" enctype="multipart/form-data">
-<a href="/">⬅️ Back to tests</a>
+
     <div>
         <h2>Default settings</h2>
         <ul>
@@ -49,7 +62,7 @@
 
         <button>Submit settings</button>
     </ul>
-
+    <input type="hidden" value="{{csrfToken}}" name="csrfToken">
 </form>
 
 <script src="/js/index.js"></script>
