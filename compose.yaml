@@ -7,6 +7,11 @@ services:
       - ${TESTS_MENU_PORT:-3000}:3000
       - ${TESTS_RESULTS_PORT:-9323}:9323
     environment:
+      - USERNAME
+      - HASHED_PASSWORD
+      - SALT_ROUNDS
+      - SESSION_SECRET
+      - SESSION_COOKIE_MAX_AGE
       - TESTS_MENU_PORT
       - TESTS_RESULTS_PORT
     security_opt:
@@ -48,3 +53,6 @@ services:
       - type: bind
         source: ./default-test-settings.json
         target: /app/default-test-settings.json
+      - type: bind
+        source: ./password.txt
+        target: /app/password.txt

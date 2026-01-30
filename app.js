@@ -1,7 +1,7 @@
 import express from 'express';
 import { engine } from 'express-handlebars';
 import { spawn } from 'child_process';
-import fs from 'fs';
+import fs, { writeFileSync } from 'fs';
 import fileUpload from 'express-fileupload';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,6 +9,10 @@ import { dirname } from 'path';
 import { createFileUploadPromise } from './helpers/file-upload-promise.js';
 import { clearLogs, logTests, readLogs } from './helpers/log-test.js';
 import process from 'process';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
 
 console.log('Launching menu...');
 
@@ -30,11 +34,46 @@ app.set('view engine', 'hbs');
 app.set('views', './templates');
 app.use(express.static('public'));
 
+if(process.env.SESSION_SECRET){ 
+    app.use(session({
+        resave: false,
+        saveUninitialized: false,
+        secret: process.env.SESSION_SECRET,
+        cookie: {
+            maxAge: +process.env.SESSION_COOKIE_MAX_AGE
+        }
+    }));
+}
+
 app.use(express.urlencoded());
 
-app.use(fileUpload())
+app.use(fileUpload());
 
-app.get('/', async (_, res) => {
+if(process.env.USERNAME) {
+    app.get('/login', async (_, res) => {
+        res.render('login');
+    });
+
+    app.post('/login', async (req, res) => {
+        const { username,  password } = req.body;
+
+        if(!username || !password) return res.render('wrong-credentials');
+        
+
+        if(username != process.env.USERNAME || !(await bcrypt.compare(password, process.env.HASHED_PASSWORD))){
+            return res.render('wrong-credentials');
+        }
+        req.session.isLoggedIn = true;
+        res.redirect('/');
+    });
+
+    app.post('/logout', async(req, res) => {
+        req.session.destroy();
+        res.redirect('/login');
+    });
+}
+
+app.get('/', authenticationMiddleware,  async (_, res) => {
 
     
     const menuCategories = testSuites.map(suite => {
@@ -63,7 +102,7 @@ app.get('/', async (_, res) => {
     });
 });
 
-app.get('/settings', (_, res) => {
+app.get('/settings', authenticationMiddleware, (_, res) => {
 
     const browsers = availableBrowsers.map(browser => {
         return {
@@ -79,14 +118,14 @@ app.get('/settings', (_, res) => {
 
 });
 
-app.get('/status', async (_, res) => {
+app.get('/status', authenticationMiddleware, async (_, res) => {
     res.render('tests-running', {
         resultsPort: process.env.TESTS_RESULTS_PORT || 9323,
         menuPort: process.env.TESTS_MENU_PORT || 3000
     });
 })
 
-app.post('/run-tests', async (req, res) => {
+app.post('/run-tests', authenticationMiddleware, async (req, res) => {
 
     killProcesses();
 
@@ -109,7 +148,7 @@ app.post('/run-tests', async (req, res) => {
 
 })
 
-app.post('/update-settings', async (req, res) => {
+app.post('/update-settings', authenticationMiddleware, async (req, res) => {
 
     const oldSettings = JSON.parse(fs.readFileSync('app-settings.json'));
 
@@ -141,7 +180,7 @@ app.post('/update-settings', async (req, res) => {
 
 });
 
-app.get('/get-tests-update', async (_, res) => {
+app.get('/get-tests-update', authenticationMiddleware, async (_, res) => {
 
     const data = readLogs();
 
@@ -154,7 +193,7 @@ app.get('/get-tests-update', async (_, res) => {
     testConsoleLogs = '';
 })
 
-app.get('/stop-tests', async (_, res) => {
+app.get('/stop-tests', authenticationMiddleware, async (_, res) => {
     killProcesses();
     res.sendStatus(200);
 });
@@ -481,5 +520,17 @@ function getGlobalSettingsToDisplay(globalSettings){
         newSetting.name = 'global--' + setting.name;
         return newSetting;
     });
+}
+
+function authenticationMiddleware(req, res, next){
+
+    if(!process.env.USERNAME){
+        next();
+        return;
+    }
+
+    if(!req.session.isLoggedIn) return res.redirect('/login');
+
+    next();
 }
 

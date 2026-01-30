@@ -11,4 +11,8 @@ function selectNone(parentNode){
     parentNode.querySelectorAll('input[type=checkbox]').forEach(input => input.checked=false);
 }
 
+document.getElementById('logout').addEventListener('click', () => {
+    fetch('/logout', {method: 'POST'});
+});
+
 
