@@ -99,12 +99,13 @@ Once the tests are done, you can click on "view test results". You will be redir
 
 ### Updating settings
 
-By default, the menu is served on port 3000 and the results on port 9323. To change these set new values inside ".env": TEST_MENU_PORT and TEST_RESULTS_PORT. This file can also be used to pass secrets and additional settings to the container:
+#### Changing ports
+
+By default, the menu is served on port 3000 and the results on port 9323. To change these set new values inside ".env": TEST_MENU_PORT and TEST_RESULTS_PORT:
 
 .env:
 
 ```
-MY_SECRET="hello-world"
 TESTS_MENU_PORT=3001
 TESTS_RESULTS_PORT=3002
 
@@ -116,13 +117,48 @@ compose.yaml:
 
 services:
     environment:
-      - MY_SECRET
       - TESTS_MENU_PORT
       - TESTS_RESULTS_PORT
 
 ```
 
 *Note*: changes to .env require container restart.
+
+#### Authentication
+
+To enable authentication, set the following values inside .env: USERNAME, HASHED_PASSWORD (using bcrypt),
+SESSION_SECRET (will be used to encrypt session cookies), SESSION_COOKIE_MAX_AGE (maximum age of session cookies, in milliseconds).
+
+After that, bind the environment variables to container:
+
+```
+services:
+    environment:
+      - USERNAME
+      - HASHED_PASSWORD
+      - SESSION_SECRET
+      - SESSION_COOKIE_MAX_AGE
+      - TESTS_MENU_PORT
+      - TESTS_RESULTS_PORT
+
+```
+
+#### Passing environment values to container
+
+You can pass your own environment variables to use in the tests:
+
+
+```
+services:
+    environment:
+      - MY_CUSTOM_SECRET
+      - TESTS_MENU_PORT
+      - TESTS_RESULTS_PORT
+
+```
+These will be available inside the tests as process.env.MY_CUSTOM_SECRET (name of the variable is up to you).
+
+#### Menu customisation
 
 Updates can be made to the app-settings.json file in order to customize the menu:
 
@@ -178,3 +214,5 @@ Updates can be made to the app-settings.json file in order to customize the menu
 
 The "globalSettings" array defines different settings that will be shown in the menu and will apply to all tests. These can then be read and used in Playwright config file or inside the test files using the readSettingsSync() helper function. If the optional property "showInSettingsPage" is set to true, the default value of the setting will be available for change in the settings page. Multiple-choice inputs not supported for now.
 The optional "fileUploads" array defines files that can be uploaded from the settings menu and later used.
+
+

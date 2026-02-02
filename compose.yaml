@@ -9,7 +9,6 @@ services:
     environment:
       - USERNAME
       - HASHED_PASSWORD
-      - SALT_ROUNDS
       - SESSION_SECRET
       - SESSION_COOKIE_MAX_AGE
       - TESTS_MENU_PORT
