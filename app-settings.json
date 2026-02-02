@@ -34,10 +34,24 @@
       "showInSettingsPage": true
     },
     {
+      "name": "videoWidth",
+      "label": "Video width",
+      "type": "number",
+      "defaultValue": 1920,
+      "showInSettingsPage": true
+    },
+    {
+      "name": "videoHeight",
+      "label": "Video height",
+      "type": "number",
+      "defaultValue": 1020,
+      "showInSettingsPage": true
+    },
+    {
       "name": "dummyCheckbox",
-      "label": "Dummy Checkbox",
+      "label": "Dummy checkbox",
       "type": "checkbox",
-      "defaultSelected": false,
+      "defaultSelected": true,
       "showInSettingsPage": true
     }
   ],
