@@ -1,4 +1,4 @@
-document.querySelector('form').addEventListener('submit', e => {
+document.getElementById('main-form').addEventListener('submit', e => {
     document.querySelectorAll('button').forEach(btn => btn.classList.add('disabled'));
     document.querySelectorAll('input').forEach(input => input.classList.add('disabled'));
 });

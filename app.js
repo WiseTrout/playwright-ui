@@ -121,15 +121,14 @@ app.get('/settings', authenticationMiddleware, (_, res) => {
     const browsers = availableBrowsers.map(browser => {
         return {
             name: browser,
-            defaultChecked: appSettings.defaultBrowsersToUse.includes(browser),
-            showLogoutButton: !!process.env.HASHED_PASSWORD
+            defaultChecked: appSettings.defaultBrowsersToUse.includes(browser)
         }
     })
 
     const globalSettings = getGlobalSettingsToDisplay(appSettings.globalSettings);
     const fileUploads = appSettings.fileUploads;
 
-    res.render('settings', {globalSettings, browsers, fileUploads});
+    res.render('settings', {globalSettings, browsers, fileUploads, showLogoutButton: !!process.env.HASHED_PASSWORD});
 
 });
 
