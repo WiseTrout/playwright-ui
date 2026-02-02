@@ -233,6 +233,9 @@ function getTestSettings(req, suitesList){
 
     for(let key in req.body){
 
+        if(key === 'csrfToken') continue;
+        
+
         if(key.split('--')[0] === 'global'){
             const settingName = key.split('--')[1];
             const inputType = appSettings.globalSettings.find(setting => setting.name === settingName).type;
