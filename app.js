@@ -545,7 +545,7 @@ function launchPlaywrightReport(){
 
 function killProcesses(){
     if(playwrightReportProcess && !playwrightReportProcess.signalCode && playwrightReportProcess.exitCode === null) process.kill(-playwrightReportProcess.pid);
-    if(testsProcess && !testsProcess.signalCode && playwrightReportProcess.exitCode === null) process.kill(-testsProcess.pid);
+    if(testsProcess && !testsProcess.signalCode && testsProcess.exitCode === null) process.kill(-testsProcess.pid);
 }
 
 function getGlobalSettingsToDisplay(globalSettings){
