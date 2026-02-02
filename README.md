@@ -10,7 +10,7 @@ To begin, copy the contents of /example-app into your directory.
 
 ### App settings
 
-app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /tests-data/available-projects.json). 
+The file app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /tests-data/available-projects.json). 
 
 The property "globalSettings" is an array of inputs that will be shown in menu and applied to all tests. These can be accessed inside the test files:
 ```
@@ -60,6 +60,25 @@ services:
 ```
 
 *Note*: changes to .env require container restart.
+
+### Adding authentication
+
+To enable authentication, set the following values inside .env: USERNAME, HASHED_PASSWORD (using bcrypt),
+SESSION_SECRET (will be used to encrypt session cookies), SESSION_COOKIE_MAX_AGE (maximum age of session cookies, in milliseconds).
+
+After that, bind the environment variables to container:
+
+```
+services:
+    environment:
+      - USERNAME
+      - HASHED_PASSWORD
+      - SESSION_SECRET
+      - SESSION_COOKIE_MAX_AGE
+      - TESTS_MENU_PORT
+      - TESTS_RESULTS_PORT
+
+```
 
 ### Developing tests
 
@@ -152,66 +171,3 @@ docker-compose up
 After the container has been created, the testing menu will be available at 'http://localhost:3000' (or a different port, see "updating settings" section) in the browser. Select the necessary settings and click on "run tests". The page will show how the tests are progressing, which ones are pending (⏸️), running (▶️), passed (✅) or failed (❌).
 
 Once the tests are done, you can click on "view test results". You will be redirected to http://localhost:9323 (or whatever port has been set in settings), where the tests report is served with additional details about how the tests went. To run new tests, go back to 'http://localhost:3000'.
-
-
-### Updating settings
-
-#### Changing ports
-
-By default, the menu is served on port 3000 and the results on port 9323. To change these set new values inside ".env": TEST_MENU_PORT and TEST_RESULTS_PORT:
-
-.env:
-
-```
-TESTS_MENU_PORT=3001
-TESTS_RESULTS_PORT=3002
-
-```
-
-compose.yaml:
-
-```
-
-services:
-    environment:
-      - TESTS_MENU_PORT
-      - TESTS_RESULTS_PORT
-
-```
-
-*Note*: changes to .env require container restart.
-
-#### Authentication
-
-To enable authentication, set the following values inside .env: USERNAME, HASHED_PASSWORD (using bcrypt),
-SESSION_SECRET (will be used to encrypt session cookies), SESSION_COOKIE_MAX_AGE (maximum age of session cookies, in milliseconds).
-
-After that, bind the environment variables to container:
-
-```
-services:
-    environment:
-      - USERNAME
-      - HASHED_PASSWORD
-      - SESSION_SECRET
-      - SESSION_COOKIE_MAX_AGE
-      - TESTS_MENU_PORT
-      - TESTS_RESULTS_PORT
-
-```
-
-#### Passing environment values to container
-
-You can pass your own environment variables to use in the tests:
-
-
-```
-services:
-    environment:
-      - MY_CUSTOM_SECRET
-      - TESTS_MENU_PORT
-      - TESTS_RESULTS_PORT
-
-```
-These will be available inside the tests as process.env.MY_CUSTOM_SECRET (name of the variable is up to you).
-
