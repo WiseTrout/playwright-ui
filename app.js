@@ -12,6 +12,8 @@ import process from 'process';
 import bcrypt from 'bcryptjs';
 import session from 'express-session';
 import { csrfSync } from "csrf-sync";
+import sqlite from "better-sqlite3";
+import bsql3ss from "better-sqlite3-session-store";
 
 console.log('Launching menu...');
 
@@ -47,7 +49,17 @@ if(process.env.HASHED_PASSWORD){
         }
     );
 
+    const SqliteStore = bsql3ss(session);
+    const sessionsDb = new sqlite("sessions.db");
+
     app.use(session({
+        store: new SqliteStore({
+            client: sessionsDb, 
+            expired:{
+                clear: true,
+                intervalMs: 90000
+            }
+        }),
         resave: false,
         saveUninitialized: false,
         secret: process.env.SESSION_SECRET,
