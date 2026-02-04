@@ -63,10 +63,9 @@ services:
 
 ### Adding authentication
 
-To enable authentication, set the following values inside .env: USERNAME, HASHED_PASSWORD (using bcrypt),
-SESSION_SECRET (will be used to encrypt session cookies), SESSION_COOKIE_MAX_AGE (maximum age of session cookies, in milliseconds).
+To enable authentication, set the following values inside .env: USERNAME, SALT_ROUNDS (used to encrypt password), SESSION_SECRET (will be used to encrypt session cookies), SESSION_COOKIE_MAX_AGE (maximum age of session cookies, in milliseconds). Create empty "password.txt" file in the root directory.
 
-After that, bind the environment variables to container:
+After that, pass the environment variables to container and bind the password file:
 
 ```
 services:
@@ -77,8 +76,13 @@ services:
       - SESSION_COOKIE_MAX_AGE
       - TESTS_MENU_PORT
       - TESTS_RESULTS_PORT
-
+    volumes:
+      - type: bind
+        source: ./password.txt
+        target: /app/password.txt
 ```
+
+The first time the container is launched, you will be prompted to set a password. It will be encrypted with bcrypt and stored inside "password.txt". To reset password, empty the "password.txt" file.
 
 ### Developing tests
 

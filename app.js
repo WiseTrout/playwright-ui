@@ -1,7 +1,7 @@
 import express from 'express';
 import { engine } from 'express-handlebars';
 import { spawn } from 'child_process';
-import fs, { writeFileSync } from 'fs';
+import fs, { readFileSync, writeFileSync } from 'fs';
 import fileUpload from 'express-fileupload';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -41,7 +41,7 @@ app.use(express.urlencoded());
 
 app.use(fileUpload());
 
-if(process.env.HASHED_PASSWORD){ 
+if(process.env.USERNAME){ 
 
     const { csrfSynchronisedProtection } = csrfSync(
         {
@@ -75,6 +75,35 @@ if(process.env.HASHED_PASSWORD){
         next();
     })
 
+    app.use((req, res, next) => {        
+        if(req.session.isLoggedIn || req.path === '/set-password'){
+            next();
+        }else{
+            const hashedPassword = readFileSync('password.txt', {encoding: 'utf8'});            
+            hashedPassword ? next() : res.redirect('/set-password');            
+        }
+        
+    });
+
+    app.get('/set-password', async (req, res) => {
+        if(req.session.isLoggedIn) {
+            res.redirect('/');
+            return;
+        }
+        if(readFileSync('password.txt', {encoding: 'utf-8'})){ 
+            res.redirect('/login');
+            return;
+        }
+        res.render('set-password');
+    });
+
+    app.post('/set-password', async (req, res) => {
+        const newPassword = req.body.password;
+        const hashedPassword = await bcrypt.hash(newPassword, process.env.SALT_ROUNDS ||10);
+        await fs.promises.writeFile('password.txt', hashedPassword);
+        res.redirect('/login');
+    }); 
+
     app.get('/login', async (_, res) => {
         res.render('login');
     });
@@ -83,9 +112,11 @@ if(process.env.HASHED_PASSWORD){
         const { username,  password } = req.body;
 
         if(!username || !password) return res.render('wrong-credentials');
+
+        const hashedPassword = readFileSync('password.txt', {encoding: 'utf-8'});
         
 
-        if(username != process.env.USERNAME || !(await bcrypt.compare(password, process.env.HASHED_PASSWORD))){
+        if(username != process.env.USERNAME || !(await bcrypt.compare(password, hashedPassword))){
             return res.render('wrong-credentials');
         }
         req.session.isLoggedIn = true;
@@ -124,7 +155,7 @@ app.get('/', authenticationMiddleware,  async (req, res) => {
         globalSettings,
         testSuites: menuCategories, 
         browsers: menuBrowsers,
-        showLogoutButton: !!process.env.HASHED_PASSWORD
+        showLogoutButton: !!process.env.USERNAME
     });
 });
 
@@ -140,7 +171,7 @@ app.get('/settings', authenticationMiddleware, (_, res) => {
     const globalSettings = getGlobalSettingsToDisplay(appSettings.globalSettings);
     const fileUploads = appSettings.fileUploads;
 
-    res.render('settings', {globalSettings, browsers, fileUploads, showLogoutButton: !!process.env.HASHED_PASSWORD});
+    res.render('settings', {globalSettings, browsers, fileUploads, showLogoutButton: !!process.env.USERNAME});
 
 });
 
@@ -578,7 +609,7 @@ function getGlobalSettingsToDisplay(globalSettings){
 
 function authenticationMiddleware(req, res, next){
 
-    if(!process.env.HASHED_PASSWORD){
+    if(!process.env.USERNAME){
         next();
         return;
     }

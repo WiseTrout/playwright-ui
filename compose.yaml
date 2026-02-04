@@ -58,3 +58,6 @@ services:
       - type: bind
         source: ./test-hooks
         target: /app/test-hooks
+      - type: bind
+        source: ./password.txt
+        target: /app/password.txt
