@@ -1,8 +1,13 @@
-import { appSettings } from "../models/app-settings";
-import { browsersList } from "../models/browsers-list";
-import { suitesMedatadata } from "../models/suites-metadata";
+import getSuitesList from "../helpers/get-suites-list.js";
+import { appSettings } from "../models/app-settings.js";
+import { browsersList } from "../models/browsers-list.js";
+import { suitesMedatadata } from "../models/suites-metadata.js";
+import { testsData } from "../models/tests-data.js";
 
 export function getMenu(_, res){
+
+    const testSuites = getSuitesList(suitesMedatadata, testsData);
+
      const menuCategories = testSuites.map(suite => {
         const {title, categories, machineName} = suite;
         return {
@@ -17,7 +22,7 @@ export function getMenu(_, res){
     const menuBrowsers = browsersList.map(browser => ({
         name: browser,
         defaultChecked: appSettings.defaultBrowsersToUse.includes(browser)
-    }))
+    }));
 
     const globalSettings = getGlobalSettingsToDisplay(appSettings.globalSettings);
 
@@ -53,4 +58,8 @@ function getGlobalSettingsToDisplay(globalSettings){
         newSetting.name = 'global--' + setting.name;
         return newSetting;
     });
+}
+
+function getMenuCategories(suitesMetadata, testsData){
+
 }

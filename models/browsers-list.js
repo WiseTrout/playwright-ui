@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 export let browsersList = [];
 
 export async function readBrowsersList(){

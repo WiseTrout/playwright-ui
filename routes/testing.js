@@ -1,5 +1,5 @@
 import express from 'express';
-import { getMenu, getTestsUpdate, runTests, stopTests } from '../controllers/testing';
+import { getMenu, getTestsUpdate, runTests, stopTests } from '../controllers/testing.js';
 
 const router = express.Router();
 

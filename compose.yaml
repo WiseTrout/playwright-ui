@@ -23,9 +23,6 @@ services:
         source: ./tests
         target: /app/tests
       - type: bind
-        source: ./templates
-        target: /app/templates
-      - type: bind
         source: ./public
         target: /app/public
       - type: bind
@@ -58,6 +55,19 @@ services:
       - type: bind
         source: ./test-hooks
         target: /app/test-hooks
+      - type: bind
+        source: ./models
+        target: /app/models
+      - type: bind
+        source: ./controllers
+        target: /app/controllers
+      - type: bind
+        source: ./views
+        target: /app/views
+      - type: bind
+        source: ./routes
+        target: /app/routes
+      
 #      Create empty file password.txt and uncomment the following lines to use authorization.
 #      To reset the password, empty the contents of existing password.txt
 #      - type: bind
