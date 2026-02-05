@@ -1,7 +1,7 @@
 import express from 'express';
 import { engine } from 'express-handlebars';
 import { spawn } from 'child_process';
-import fs, { readFileSync, writeFileSync } from 'fs';
+import fs from 'fs';
 import fileUpload from 'express-fileupload';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -16,7 +16,6 @@ import sqlite from "better-sqlite3";
 import bsql3ss from "better-sqlite3-session-store";
 
 console.log('Launching menu...');
-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,15 +33,10 @@ app.engine('hbs', engine({extname: '.hbs', partialsDir: __dirname + '/templates/
 app.set('view engine', 'hbs');
 app.set('views', './templates');
 app.use(express.static('public'));
-
-
-
 app.use(express.urlencoded());
-
 app.use(fileUpload());
 
-if(process.env.USERNAME){ 
-
+if(process.env.USERNAME) {
     const { csrfSynchronisedProtection } = csrfSync(
         {
             getTokenFromRequest: (req) => req.body["csrfToken"]
@@ -62,9 +56,9 @@ if(process.env.USERNAME){
         }),
         resave: false,
         saveUninitialized: false,
-        secret: process.env.SESSION_SECRET,
+        secret: process.env.SESSION_SECRET || randomstring(10),
         cookie: {
-            maxAge: +process.env.SESSION_COOKIE_MAX_AGE
+            maxAge: +process.env.SESSION_COOKIE_MAX_AGE || 900000
         }
     }));
 
@@ -79,7 +73,7 @@ if(process.env.USERNAME){
         if(req.session.isLoggedIn || req.path === '/set-password'){
             next();
         }else{
-            const hashedPassword = readFileSync('password.txt', {encoding: 'utf8'});            
+            const hashedPassword = fs.readFileSync('password.txt', {encoding: 'utf8'});
             hashedPassword ? next() : res.redirect('/set-password');            
         }
         
@@ -90,7 +84,7 @@ if(process.env.USERNAME){
             res.redirect('/');
             return;
         }
-        if(readFileSync('password.txt', {encoding: 'utf-8'})){ 
+        if(fs.readFileSync('password.txt', {encoding: 'utf-8'})){
             res.redirect('/login');
             return;
         }
@@ -99,7 +93,7 @@ if(process.env.USERNAME){
 
     app.post('/set-password', async (req, res) => {
         const newPassword = req.body.password;
-        const hashedPassword = await bcrypt.hash(newPassword, process.env.SALT_ROUNDS ||10);
+        const hashedPassword = await bcrypt.hash(newPassword, process.env.SALT_ROUNDS || 10);
         await fs.promises.writeFile('password.txt', hashedPassword);
         res.redirect('/login');
     }); 
@@ -113,7 +107,7 @@ if(process.env.USERNAME){
 
         if(!username || !password) return res.render('wrong-credentials');
 
-        const hashedPassword = readFileSync('password.txt', {encoding: 'utf-8'});
+        const hashedPassword = fs.readFileSync('password.txt', {encoding: 'utf-8'});
         
 
         if(username != process.env.USERNAME || !(await bcrypt.compare(password, hashedPassword))){
@@ -617,5 +611,21 @@ function authenticationMiddleware(req, res, next){
     if(!req.session.isLoggedIn) return res.redirect('/login');
 
     next();
+}
+
+/**
+ * Generate random string.
+ *
+ * @param int length
+ * @returns {string}
+ */
+function randomstring(length) {
+    let result           = '';
+    const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_- ';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
 }
 

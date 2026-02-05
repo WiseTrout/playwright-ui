@@ -58,6 +58,8 @@ services:
       - type: bind
         source: ./test-hooks
         target: /app/test-hooks
-      - type: bind
-        source: ./password.txt
-        target: /app/password.txt
+#      Create empty file password.txt and uncomment the following lines to use authorization.
+#      To reset the password, empty the contents of existing password.txt
+#      - type: bind
+#        source: ./password.txt
+#        target: /app/password.txt

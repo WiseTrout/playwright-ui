@@ -63,7 +63,11 @@ services:
 
 ### Adding authentication
 
-To enable authentication, set the following values inside .env: USERNAME, SALT_ROUNDS (used to encrypt password), SESSION_SECRET (will be used to encrypt session cookies), SESSION_COOKIE_MAX_AGE (maximum age of session cookies, in milliseconds). Create empty "password.txt" file in the root directory.
+To enable authentication, add USERNAME variable to .env and uncomment password.txt session in compose.yaml.
+Other environment variables that affect authentication are: SALT_ROUNDS (used to encrypt password, default is 10),
+SESSION_SECRET (default is to randomly generate secret on app start), SESSION_COOKIE_MAX_AGE.
+
+Create empty "password.txt" file in the root directory.
 
 After that, pass the environment variables to container and bind the password file:
 
@@ -71,7 +75,6 @@ After that, pass the environment variables to container and bind the password fi
 services:
     environment:
       - USERNAME
-      - HASHED_PASSWORD
       - SESSION_SECRET
       - SESSION_COOKIE_MAX_AGE
       - TESTS_MENU_PORT
