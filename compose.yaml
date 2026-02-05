@@ -7,6 +7,10 @@ services:
       - ${TESTS_MENU_PORT:-3000}:3000
       - ${TESTS_RESULTS_PORT:-9323}:9323
     environment:
+      - USERNAME
+      - HASHED_PASSWORD
+      - SESSION_SECRET
+      - SESSION_COOKIE_MAX_AGE
       - TESTS_MENU_PORT
       - TESTS_RESULTS_PORT
     security_opt:
@@ -54,3 +58,8 @@ services:
       - type: bind
         source: ./test-hooks
         target: /app/test-hooks
+#      Create empty file password.txt and uncomment the following lines to use authorization.
+#      To reset the password, empty the contents of existing password.txt
+#      - type: bind
+#        source: ./password.txt
+#        target: /app/password.txt

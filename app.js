@@ -9,9 +9,13 @@ import { dirname } from 'path';
 import { createFileUploadPromise } from './helpers/file-upload-promise.js';
 import { clearLogs, logTests, readLogs } from './helpers/log-test.js';
 import process from 'process';
+import bcrypt from 'bcryptjs';
+import session from 'express-session';
+import { csrfSync } from "csrf-sync";
+import sqlite from "better-sqlite3";
+import bsql3ss from "better-sqlite3-session-store";
 
 console.log('Launching menu...');
-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,12 +33,97 @@ app.engine('hbs', engine({extname: '.hbs', partialsDir: __dirname + '/templates/
 app.set('view engine', 'hbs');
 app.set('views', './templates');
 app.use(express.static('public'));
-
 app.use(express.urlencoded());
+app.use(fileUpload());
 
-app.use(fileUpload())
+if(process.env.USERNAME) {
+    const { csrfSynchronisedProtection } = csrfSync(
+        {
+            getTokenFromRequest: (req) => req.body["csrfToken"]
+        }
+    );
 
-app.get('/', async (_, res) => {
+    const SqliteStore = bsql3ss(session);
+    const sessionsDb = new sqlite("sessions.db");
+
+    app.use(session({
+        store: new SqliteStore({
+            client: sessionsDb, 
+            expired:{
+                clear: true,
+                intervalMs: 90000
+            }
+        }),
+        resave: false,
+        saveUninitialized: false,
+        secret: process.env.SESSION_SECRET || randomstring(10),
+        cookie: {
+            maxAge: +process.env.SESSION_COOKIE_MAX_AGE || 900000
+        }
+    }));
+
+    app.use(csrfSynchronisedProtection);
+
+    app.use((req, res, next) => {
+        res.locals.csrfToken = req.csrfToken();
+        next();
+    })
+
+    app.use((req, res, next) => {        
+        if(req.session.isLoggedIn || req.path === '/set-password'){
+            next();
+        }else{
+            const hashedPassword = fs.readFileSync('password.txt', {encoding: 'utf8'});
+            hashedPassword ? next() : res.redirect('/set-password');            
+        }
+        
+    });
+
+    app.get('/set-password', async (req, res) => {
+        if(req.session.isLoggedIn) {
+            res.redirect('/');
+            return;
+        }
+        if(fs.readFileSync('password.txt', {encoding: 'utf-8'})){
+            res.redirect('/login');
+            return;
+        }
+        res.render('set-password');
+    });
+
+    app.post('/set-password', async (req, res) => {
+        const newPassword = req.body.password;
+        const hashedPassword = await bcrypt.hash(newPassword, process.env.SALT_ROUNDS || 10);
+        await fs.promises.writeFile('password.txt', hashedPassword);
+        res.redirect('/login');
+    }); 
+
+    app.get('/login', async (_, res) => {
+        res.render('login');
+    });
+
+    app.post('/login', async (req, res) => {
+        const { username,  password } = req.body;
+
+        if(!username || !password) return res.render('wrong-credentials');
+
+        const hashedPassword = fs.readFileSync('password.txt', {encoding: 'utf-8'});
+        
+
+        if(username != process.env.USERNAME || !(await bcrypt.compare(password, hashedPassword))){
+            return res.render('wrong-credentials');
+        }
+        req.session.isLoggedIn = true;
+        res.redirect('/');
+    });
+
+    app.post('/logout', async(req, res) => {
+        req.session.destroy();
+        res.redirect('/login');
+    });
+}
+
+app.get('/', authenticationMiddleware,  async (req, res) => {
 
     
     const menuCategories = testSuites.map(suite => {
@@ -59,11 +148,12 @@ app.get('/', async (_, res) => {
         title: appSettings.applicationName, 
         globalSettings,
         testSuites: menuCategories, 
-        browsers: menuBrowsers
+        browsers: menuBrowsers,
+        showLogoutButton: !!process.env.USERNAME
     });
 });
 
-app.get('/settings', (_, res) => {
+app.get('/settings', authenticationMiddleware, (_, res) => {
 
     const browsers = availableBrowsers.map(browser => {
         return {
@@ -75,18 +165,18 @@ app.get('/settings', (_, res) => {
     const globalSettings = getGlobalSettingsToDisplay(appSettings.globalSettings);
     const fileUploads = appSettings.fileUploads;
 
-    res.render('settings', {globalSettings, browsers, fileUploads});
+    res.render('settings', {globalSettings, browsers, fileUploads, showLogoutButton: !!process.env.USERNAME});
 
 });
 
-app.get('/status', async (_, res) => {
+app.get('/status', authenticationMiddleware, async (_, res) => {
     res.render('tests-running', {
         resultsPort: process.env.TESTS_RESULTS_PORT || 9323,
         menuPort: process.env.TESTS_MENU_PORT || 3000
     });
 })
 
-app.post('/run-tests', async (req, res) => {
+app.post('/run-tests', authenticationMiddleware, async (req, res) => {
 
     killProcesses();
 
@@ -109,7 +199,7 @@ app.post('/run-tests', async (req, res) => {
 
 })
 
-app.post('/update-settings', async (req, res) => {
+app.post('/update-settings', authenticationMiddleware, async (req, res) => {
 
     const oldSettings = JSON.parse(fs.readFileSync('app-settings.json'));
 
@@ -141,7 +231,7 @@ app.post('/update-settings', async (req, res) => {
 
 });
 
-app.get('/get-tests-update', async (_, res) => {
+app.get('/get-tests-update', authenticationMiddleware, async (_, res) => {
 
     const data = readLogs();
 
@@ -154,7 +244,7 @@ app.get('/get-tests-update', async (_, res) => {
     testConsoleLogs = '';
 })
 
-app.get('/stop-tests', async (_, res) => {
+app.get('/stop-tests', authenticationMiddleware, async (_, res) => {
     killProcesses();
     res.sendStatus(200);
 });
@@ -179,6 +269,9 @@ function getTestSettings(req, suitesList){
     };
 
     for(let key in req.body){
+
+        if(key === 'csrfToken') continue;
+        
 
         if(key.split('--')[0] === 'global'){
             const settingName = key.split('--')[1];
@@ -489,7 +582,7 @@ function launchPlaywrightReport(){
 
 function killProcesses(){
     if(playwrightReportProcess && !playwrightReportProcess.signalCode && playwrightReportProcess.exitCode === null) process.kill(-playwrightReportProcess.pid);
-    if(testsProcess && !testsProcess.signalCode && playwrightReportProcess.exitCode === null) process.kill(-testsProcess.pid);
+    if(testsProcess && !testsProcess.signalCode && testsProcess.exitCode === null) process.kill(-testsProcess.pid);
 }
 
 function getGlobalSettingsToDisplay(globalSettings){
@@ -506,5 +599,33 @@ function getGlobalSettingsToDisplay(globalSettings){
         newSetting.name = 'global--' + setting.name;
         return newSetting;
     });
+}
+
+function authenticationMiddleware(req, res, next){
+
+    if(!process.env.USERNAME){
+        next();
+        return;
+    }
+
+    if(!req.session.isLoggedIn) return res.redirect('/login');
+
+    next();
+}
+
+/**
+ * Generate random string.
+ *
+ * @param int length
+ * @returns {string}
+ */
+function randomstring(length) {
+    let result           = '';
+    const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_- ';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
 }
 

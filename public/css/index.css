@@ -51,6 +51,28 @@ h3 {
     font-weight: 600;
 }
 
+header form{
+    background: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+header menu{
+    list-style: none;
+    display: flex;
+    gap: 10px;
+}
+
+header menu button, header menu a{
+    background: none;
+    padding: 0;
+    color: #0351a0;
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+
 /* Form container */
 form {
     max-width: 900px;
@@ -81,7 +103,7 @@ ul li {
 }
 
 /* Input fields */
-input[type="text"], input[type="number"] {
+input[type="text"], input[type="password"], input[type="number"] {
     width: 100%;
     max-width: 500px;
     padding: 0.75rem;
@@ -91,7 +113,7 @@ input[type="text"], input[type="number"] {
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-input[type="text"]:focus, input[type="number"]:focus {
+input[type="text"]:focus, input[type="password"]:focus, input[type="number"]:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -133,7 +155,7 @@ input[type="file"] {
 }
 
 /* Buttons */
-button {
+button, .button{
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
     font-weight: 600;

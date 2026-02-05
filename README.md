@@ -10,7 +10,7 @@ To begin, copy the contents of /example-app into your directory.
 
 ### App settings
 
-app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /tests-data/available-projects.json). 
+The file app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /tests-data/available-projects.json). 
 
 The property "globalSettings" is an array of inputs that will be shown in menu and applied to all tests. These can be accessed inside the test files:
 ```
@@ -60,6 +60,32 @@ services:
 ```
 
 *Note*: changes to .env require container restart.
+
+### Adding authentication
+
+To enable authentication, add USERNAME variable to .env and uncomment password.txt session in compose.yaml.
+Other environment variables that affect authentication are: SALT_ROUNDS (used to encrypt password, default is 10),
+SESSION_SECRET (default is to randomly generate secret on app start), SESSION_COOKIE_MAX_AGE.
+
+Create empty "password.txt" file in the root directory.
+
+After that, pass the environment variables to container and bind the password file:
+
+```
+services:
+    environment:
+      - USERNAME
+      - SESSION_SECRET
+      - SESSION_COOKIE_MAX_AGE
+      - TESTS_MENU_PORT
+      - TESTS_RESULTS_PORT
+    volumes:
+      - type: bind
+        source: ./password.txt
+        target: /app/password.txt
+```
+
+The first time the container is launched, you will be prompted to set a password. It will be encrypted with bcrypt and stored inside "password.txt". To reset password, empty the "password.txt" file.
 
 ### Developing tests
 

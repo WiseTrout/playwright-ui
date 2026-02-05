@@ -13,9 +13,13 @@
     "jshint": "^2.13.6"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.5.0",
+    "better-sqlite3-session-store": "^0.1.0",
+    "csrf-sync": "^4.2.1",
     "express": "^5.1.0",
     "express-fileupload": "^1.5.2",
-    "express-handlebars": "^8.0.3"
+    "express-handlebars": "^8.0.5",
+    "express-session": "^1.19.0"
   }
 }
