@@ -1,5 +1,5 @@
 import { test as base } from '@playwright/test';
-import { checkIfAllTestsArePending, updateTestStatus } from '../helpers/log-test';
+import { checkIfAllTestsArePending, updateTestStatus } from '../models/test-logs.js';
 import readSettingsSync from '../helpers/read-settings-sync';
 import beforeEach from '../test-hooks/before-each.js';
 import afterEach from '../test-hooks/after-each.js';

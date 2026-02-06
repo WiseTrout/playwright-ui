@@ -1,4 +1,5 @@
 export default function getSuitesList(suitesMetadata, testFiles){
+
     const suitesInfo = suitesMetadata.map(metadata => {
         const suiteInfo = {...metadata, categories: []};
 
@@ -18,6 +19,7 @@ export default function getSuitesList(suitesMetadata, testFiles){
         }
          return suiteInfo;
     });
+    
 
     return suitesInfo;
 }

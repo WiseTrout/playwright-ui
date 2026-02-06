@@ -35,7 +35,7 @@ resetTestSettings()
 .then(() => {
 
     app.use((_, res, next) => {
-        res.locals.title = appSettings.title;
+        res.locals.title = appSettings.applicationName;
         next();
     })
 

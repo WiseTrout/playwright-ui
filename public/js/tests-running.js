@@ -53,7 +53,7 @@ function startPeriodicDataUpdate(){
     stopButton.onclick = () => {
         h1.innerText = 'Stopping tests...';
         
-        fetch('/stop-tests').then(() => {
+        fetch('/tests/stop').then(() => {
             h1.innerText = 'Tests stopped';
             clearInterval(interval);
             retryBtn.disabled = false;
@@ -64,7 +64,7 @@ function startPeriodicDataUpdate(){
 }
 
 async function fetchData(){
-    const res = await fetch('/get-tests-update');
+    const res = await fetch('/tests/get-update');
     if(!res.ok) throw new Error('Response not okay');
     const json = await res.json();
     return json;

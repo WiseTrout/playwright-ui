@@ -1,7 +1,8 @@
 import { spawn } from "child_process";
 
 export let testsData;
-export function readTestsData(){
+export async function readTestsData(){
+    testsData = await new Promise((res, rej) => {
             let json = '';
             const process = spawn('npx', ['playwright', 'test', '--list', '--reporter=json']);
     
@@ -12,18 +13,19 @@ export function readTestsData(){
             })
     
             process.on('error', (err) => {
-                throw new Error(err);
+                rej(err);
             })
     
             process.on('close', () => {
                 const data = JSON.parse(json);
                 if(data.errors.length){
                     console.log(data.errors);
-                    throw new Error('Error reading tests data');
+                    rej('Error reading tests data');
                 }else{
-                    testsData = data.suites;
+                    res(data.suites);
                 }
                 
             });
-    
+        }
+        )
 }
