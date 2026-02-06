@@ -8,9 +8,10 @@ import { dirname } from 'path';
 import { readAppSettings, appSettings } from "./models/app-settings.js";
 import { readBrowsersList } from "./models/browsers-list.js";
 import { readSuitesMetadata } from "./models/suites-metadata.js";
-import { readTestsData } from "./models/tests-data.js";
+import { storeTestsInAllTestsArray } from "./models/tests-data.js";
 import testRouter from './routes/testing.js';
 import { resetTestSettings } from './models/test-settings.js';
+import settingsRouter from './routes/settings.js';
 
 
 console.log('Launching menu...');
@@ -27,11 +28,12 @@ app.use(express.urlencoded());
 app.use(fileUpload());
 
 app.use('/tests', testRouter);
+app.use('/settings', settingsRouter);
 
 app.get('/', (_, res) => res.redirect('/tests'));
 
 resetTestSettings()
-.then(() => Promise.all([readBrowsersList(), readSuitesMetadata(), readAppSettings(), readTestsData()]))
+.then(() => Promise.all([readBrowsersList(), readSuitesMetadata(), readAppSettings(), storeTestsInAllTestsArray()]))
 .then(() => {
 
     app.use((_, res, next) => {

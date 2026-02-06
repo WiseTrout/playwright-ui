@@ -2,14 +2,14 @@ import { appSettings } from "../models/app-settings.js";
 import { browsersList } from "../models/browsers-list.js";
 import { clearConsoleLogs, consoleLogs, writeConsoleLogs } from "../models/console-logs.js";
 import { killProcesses, launchPlaywrightReport, launchTests } from "../models/processes.js";
-import { readSuitesMetadata, suitesMedatadata } from "../models/suites-metadata.js";
+import { suitesMedatadata } from "../models/suites-metadata.js";
 import { clearLogs, logTests, readLogs } from "../models/test-logs.js";
-import { resetTestSettings, writeTestSettings } from "../models/test-settings.js";
-import { readTestsData, testsData } from "../models/tests-data.js";
+import { writeTestSettings } from "../models/test-settings.js";
+import { allTestsData, selectedTestsData, storeTestsInSelectedTestsArray } from "../models/tests-data.js";
 
 export function getMenu(_, res){
 
-    const testSuites = getSuitesList(suitesMedatadata, testsData);
+    const testSuites = getSuitesList(suitesMedatadata, allTestsData);
 
      const menuCategories = testSuites.map(suite => {
         const {title, categories, machineName} = suite;
@@ -38,7 +38,7 @@ export function getMenu(_, res){
 
 export async function runTests(req, res){
     
-    const testSuites = getSuitesList(suitesMedatadata, testsData);
+    const testSuites = getSuitesList(suitesMedatadata, allTestsData);
 
     
     killProcesses();
@@ -48,13 +48,9 @@ export async function runTests(req, res){
 
     await writeTestSettings(settingsObject);
     
-    await readTestsData();
+    await storeTestsInSelectedTestsArray();
 
-    const initialLogs = createInitialTestLogs(testsData, settingsObject);
-
-    console.log('Initial logs:');
-    console.log(initialLogs);
-    
+    const initialLogs = createInitialTestLogs(selectedTestsData, settingsObject);
 
     clearLogs();
     logTests(initialLogs);
@@ -64,6 +60,8 @@ export async function runTests(req, res){
     await launchTests(settingsObject, writeConsoleLogs);
 
     await launchPlaywrightReport();
+
+
 }
 
 export function getStatusPage(_, res){
@@ -87,10 +85,6 @@ export function getTestsUpdate(_, res){
 
 export async function stopTests(_, res){
     killProcesses();
-
-    // Need to reset the value of testsData back to all tests, to show these in menu
-    await resetTestSettings();
-    await readTestsData();
     res.redirect('/tests');
 }
 
