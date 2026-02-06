@@ -1,8 +1,8 @@
 import getSuitesList from "../helpers/get-suites-list.js";
 import { appSettings } from "../models/app-settings.js";
 import { browsersList } from "../models/browsers-list.js";
-import { clearConsoleLogs, consoleLogs } from "../models/console-logs.js";
-import { killProcesses } from "../models/processes.js";
+import { clearConsoleLogs, consoleLogs, writeConsoleLogs } from "../models/console-logs.js";
+import { killProcesses, launchPlaywrightReport, launchTests } from "../models/processes.js";
 import { suitesMedatadata } from "../models/suites-metadata.js";
 import { clearLogs, logTests, readLogs } from "../models/test-logs.js";
 import { writeTestSettings } from "../models/test-settings.js";
@@ -62,9 +62,9 @@ export async function runTests(req, res){
     
     res.redirect('/tests/status');
     
-        // await launchTests(settingsObject);
-    
-        // await launchPlaywrightReport();
+    await launchTests(settingsObject, writeConsoleLogs);
+
+    await launchPlaywrightReport();
 }
 
 export function getStatusPage(_, res){
