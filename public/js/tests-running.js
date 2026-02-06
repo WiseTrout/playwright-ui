@@ -49,18 +49,6 @@ function startPeriodicDataUpdate(){
     }
     requestInProcess = false;
     }, UPDATE_INTERVAL_MS);
-
-    stopButton.onclick = () => {
-        h1.innerText = 'Stopping tests...';
-        
-        fetch('/tests/stop').then(() => {
-            h1.innerText = 'Tests stopped';
-            clearInterval(interval);
-            retryBtn.disabled = false;
-            viewResultsBtn.disabled = true;
-            window.location.href = `http://localhost:${stopButton.getAttribute('data-menu-port')}`;
-        });
-    }
 }
 
 async function fetchData(){

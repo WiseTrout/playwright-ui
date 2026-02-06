@@ -1,11 +1,10 @@
-import getSuitesList from "../helpers/get-suites-list.js";
 import { appSettings } from "../models/app-settings.js";
 import { browsersList } from "../models/browsers-list.js";
 import { clearConsoleLogs, consoleLogs, writeConsoleLogs } from "../models/console-logs.js";
 import { killProcesses, launchPlaywrightReport, launchTests } from "../models/processes.js";
-import { suitesMedatadata } from "../models/suites-metadata.js";
+import { readSuitesMetadata, suitesMedatadata } from "../models/suites-metadata.js";
 import { clearLogs, logTests, readLogs } from "../models/test-logs.js";
-import { writeTestSettings } from "../models/test-settings.js";
+import { resetTestSettings, writeTestSettings } from "../models/test-settings.js";
 import { readTestsData, testsData } from "../models/tests-data.js";
 
 export function getMenu(_, res){
@@ -86,7 +85,14 @@ export function getTestsUpdate(_, res){
         clearConsoleLogs();
 }
 
-export function stopTests(req, res){}
+export async function stopTests(_, res){
+    killProcesses();
+
+    // Need to reset the value of testsData back to all tests, to show these in menu
+    await resetTestSettings();
+    await readTestsData();
+    res.redirect('/tests');
+}
 
 
 function getGlobalSettingsToDisplay(globalSettings){
@@ -216,4 +222,30 @@ function checkIfTestsAreDone(logsObj){
         }
     }
     return true;
+}
+
+function getSuitesList(suitesMetadata, testFiles){
+
+    const suitesInfo = suitesMetadata.map(metadata => {
+        const suiteInfo = {...metadata, categories: []};
+
+        for(const fileName of metadata.testFiles){
+            
+            const fileInfo = testFiles.find(test => test.file === fileName);
+            if(!fileInfo) throw new Error(`Test file ${fileName} not found`);
+
+            const fileTestCategories = fileInfo.suites.map(testGroup => ({
+                title: testGroup.title,
+                tests: testGroup.specs.map(test => test.title)
+            }))
+            
+            suiteInfo.categories = suiteInfo.categories.concat(fileTestCategories);
+
+
+        }
+         return suiteInfo;
+    });
+    
+
+    return suitesInfo;
 }
