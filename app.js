@@ -31,29 +31,6 @@ app.use(express.static('public'));
 app.use(express.urlencoded());
 app.use(fileUpload());
 
-
-if(process.env.USERNAME){
-    console.log('Setting auth...');
-    
-    app.use(sessionMiddleware);
-
-    app.use(csrfSynchronisedProtection);
-
-    app.use((req, res, next) => {
-        res.locals.csrfToken = req.csrfToken();
-        next();
-    })
-
-    app.use(passwordExistanceMiddleware);
-
-    app.use('/', authRouter);
-}
-
-app.use('/tests', testRouter);
-app.use('/settings', settingsRouter);
-
-app.get('/', (_, res) => res.redirect('/tests'));
-
 resetTestSettings()
 .then(() => Promise.all([readBrowsersList(), readSuitesMetadata(), readAppSettings(), storeTestsInAllTestsArray()]))
 .then(() => {
@@ -62,6 +39,29 @@ resetTestSettings()
         res.locals.title = appSettings.applicationName;
         next();
     })
+
+    if(process.env.USERNAME){
+        console.log('Setting auth...');
+        
+        app.use(sessionMiddleware);
+
+        app.use(csrfSynchronisedProtection);
+
+        app.use((req, res, next) => {
+            res.locals.csrfToken = req.csrfToken();
+            next();
+        })
+
+        app.use(passwordExistanceMiddleware);
+
+        app.use('/', authRouter);
+    }
+
+    app.use('/tests', testRouter);
+    app.use('/settings', settingsRouter);
+
+    app.get('/', (_, res) => res.redirect('/tests'));
+    
 
     app.listen(3000, () => console.log(`Testing menu is available at http://localhost:${process.env.TESTS_MENU_PORT || 3000}`));
 });
