@@ -12,6 +12,10 @@ import { storeTestsInAllTestsArray } from "./models/tests-data.js";
 import testRouter from './routes/testing.js';
 import { resetTestSettings } from './models/test-settings.js';
 import settingsRouter from './routes/settings.js';
+import authRouter from './routes/auth.js';
+import { sessionMiddleware } from './controllers/session-middleware.js';
+import { csrfSynchronisedProtection } from './controllers/csrf.js';
+import { passwordExistanceMiddleware } from './controllers/auth.js';
 
 
 console.log('Launching menu...');
@@ -26,6 +30,24 @@ app.set('views', './views');
 app.use(express.static('public'));
 app.use(express.urlencoded());
 app.use(fileUpload());
+
+
+if(process.env.USERNAME){
+    console.log('Setting auth...');
+    
+    app.use(sessionMiddleware);
+
+    app.use(csrfSynchronisedProtection);
+
+    app.use((req, res, next) => {
+        res.locals.csrfToken = req.csrfToken();
+        next();
+    })
+
+    app.use(passwordExistanceMiddleware);
+
+    app.use('/', authRouter);
+}
 
 app.use('/tests', testRouter);
 app.use('/settings', settingsRouter);

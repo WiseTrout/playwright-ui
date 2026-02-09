@@ -32,7 +32,8 @@ export function getMenu(_, res){
     res.render('index', {
         globalSettings,
         testSuites: menuCategories, 
-        browsers: menuBrowsers
+        browsers: menuBrowsers,
+        showLogoutButton: !!process.env.USERNAME
     });
 }
 
