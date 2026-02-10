@@ -8,7 +8,6 @@ services:
         org.opencontainers.image.source: https://github.com/wisetrout/playwright-ui
         org.opencontainers.image.description: "Playwright UI"
         org.opencontainers.image.licenses: MIT
-    #command: tail -f /dev/null
     ports:
       - ${TESTS_MENU_PORT:-3000}:3000
       - ${TESTS_RESULTS_PORT:-9323}:9323
