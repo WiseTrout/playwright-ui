@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
-import { test } from '../tests-lib/fixtures.js';
-import createDescribe from '../tests-lib/describe.js';
+import { test } from '../ui-lib/fixtures.js';
+import createDescribe from '../ui-lib/describe.js';
 import readSettingsSync from '../helpers/read-settings-sync.js';
 
 

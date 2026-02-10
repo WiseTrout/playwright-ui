@@ -129,13 +129,13 @@ The test file must be placed inside "/tests" and have the name we picked in step
 
 All tests must be grouped, these will be the test categories that we see in the menu. When there are several test files in one suite, all the test groups across all files will be concatenated and shown as one list under that suite name. To group tests inside a test file, one must call the createDescribe() function and pass the file name to it. The returned value will be a function that can be used the same way that a test.describe() function would. The difference is that behind the scenes, this new function reads the test settings and filters out the categories we must skip when we launch the tests. 
 
-The separate tests inside of each group must be registered using the test() function. *Important*: this function must be imported from "../tests-lib/fixtures.js", *not* directly from Playwright. The reason is that the fixture adds test progress logging.
+The separate tests inside of each group must be registered using the test() function. *Important*: this function must be imported from "../ui-lib/fixtures.js", *not* directly from Playwright. The reason is that the fixture adds test progress logging.
 
 Example:
 
 ```
-import { test } from "../tests-lib/fixtures.js";
-import createDescribe from '../tests-lib/describe.js';
+import { test } from "../ui-lib/fixtures.js";
+import createDescribe from '../ui-lib/describe.js';
 
 const describe = createDescribe("my-new-test.spec.js");
 
@@ -153,7 +153,7 @@ describe('category 1', () => {
 
 3) Optional: add beforeEach() and afterEach() functions:
 
-If you want to add a beforeEach function to run before every one of your tests or an afterEach function to run after each test, you can add this logic inside the functions in /test-hooks/before-each.js and /test-hooks/after-each.js.
+If you want to add a beforeEach function to run before every one of your tests or an afterEach function to run after each test, you can add this logic inside the functions in /hooks/before-each.js and /hooks/after-each.js.
 
 ### Running tests
 

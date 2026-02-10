@@ -1,9 +1,15 @@
 services:
-  tests-menu:
+  pw-ui:
     init: true
     ipc: host
-    build: .
-    ports: 
+    build:
+      context: .
+      labels:
+        org.opencontainers.image.source: https://github.com/wisetrout/playwright-ui
+        org.opencontainers.image.description: "Playwright UI"
+        org.opencontainers.image.licenses: MIT
+    #command: tail -f /dev/null
+    ports:
       - ${TESTS_MENU_PORT:-3000}:3000
       - ${TESTS_RESULTS_PORT:-9323}:9323
     environment:
@@ -15,51 +21,17 @@ services:
       - TESTS_RESULTS_PORT
     security_opt:
       - seccomp=seccomp_profile.json
-    volumes:
-      - type: bind
-        source: ./app.js
-        target: /app/app.js
-      - type: bind
-        source: ./tests
-        target: /app/tests
-      - type: bind
-        source: ./templates
-        target: /app/templates
-      - type: bind
-        source: ./public
-        target: /app/public
-      - type: bind
-        source: ./tests-data
-        target: /app/tests-data
-      - type: bind
-        source: ./helpers
-        target: /app/helpers
-      - type: bind
-        source: ./playwright.config.js
-        target: /app/playwright.config.js
-      - type: bind
-        source: ./app-settings.json
-        target: /app/app-settings.json
-      - type: bind
-        source: ./package.json
-        target: /app/package.json
-      - type: bind
-        source: ./package-lock.json
-        target: /app/package-lock.json
-      - type: bind
-        source: ./test-settings.json
-        target: /app/test-settings.json
-      - type: bind
-        source: ./default-test-settings.json
-        target: /app/default-test-settings.json
-      - type: bind
-        source: ./tests-lib
-        target: /app/tests-lib
-      - type: bind
-        source: ./test-hooks
-        target: /app/test-hooks
+#    volumes:
+#      - .:/app
+      # Expose the library to the host for IDE indexing (Read-Only)
+#      - ./ui-lib:/app/ui-lib:ro
+#      - /app/node_modules
+      # 3. Persist node_modules inside the container
+#      - pw_ui_node_modules:/app/node_modules
 #      Create empty file password.txt and uncomment the following lines to use authorization.
 #      To reset the password, empty the contents of existing password.txt
 #      - type: bind
 #        source: ./password.txt
 #        target: /app/password.txt
+#volumes:
+#  pw_ui_node_modules:

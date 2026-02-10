@@ -1,1 +1,10 @@
-{}
+{
+  "global": {
+    "baseUrl": "https://wisetrout.com",
+    "visualRegression": "test"
+  },
+  "selectedBrowsers": [
+    "chromium"
+  ],
+  "testAllSuites": true
+}
