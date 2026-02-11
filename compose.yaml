@@ -1,9 +1,36 @@
 services:
-  tests-menu:
+  pw-ui-nochrome:
     init: true
     ipc: host
-    build: .
-    ports: 
+    command: tail /dev/null -f
+    build:
+      args:
+        INSTALL_CHROME: 0
+      context: .
+      labels:
+        org.opencontainers.image.source: https://github.com/wisetrout/playwright-ui
+        org.opencontainers.image.description: "Playwright UI"
+        org.opencontainers.image.licenses: MIT
+      tags:
+        - "0.3-nochrome"
+        - "nochrome"
+    ports:
+      - ${TESTS_MENU_PORT:-5000}:3000
+      - ${TESTS_RESULTS_PORT:-5001}:9323
+  pw-ui:
+    init: true
+    ipc: host
+    command: tail /dev/null -f
+    build:
+      context: .
+      labels:
+        org.opencontainers.image.source: https://github.com/wisetrout/playwright-ui
+        org.opencontainers.image.description: "Playwright UI"
+        org.opencontainers.image.licenses: MIT
+      tags:
+        - "0.3"
+        - "latest"
+    ports:
       - ${TESTS_MENU_PORT:-3000}:3000
       - ${TESTS_RESULTS_PORT:-9323}:9323
     environment:
@@ -16,6 +43,7 @@ services:
     security_opt:
       - seccomp=seccomp_profile.json
     volumes:
+<<<<<<< HEAD
       - type: bind
         source: ./app.js
         target: /app/app.js
@@ -68,8 +96,18 @@ services:
         source: ./routes
         target: /app/routes
       
+=======
+      - ./app.js:/app.js
+      # Expose the library to the host for IDE indexing (Read-Only)
+#      - ./ui-lib:/app/ui-lib:ro
+#      - /app/node_modules
+      # 3. Persist node_modules inside the container
+#      - pw_ui_node_modules:/app/node_modules
+>>>>>>> main
 #      Create empty file password.txt and uncomment the following lines to use authorization.
 #      To reset the password, empty the contents of existing password.txt
 #      - type: bind
 #        source: ./password.txt
 #        target: /app/password.txt
+#volumes:
+#  pw_ui_node_modules:

@@ -2,14 +2,14 @@
 import { defineConfig, devices } from '@playwright/test';
 import fs from 'fs';
 
-const settingsJson = fs.readFileSync('test-settings.json', 'utf-8');
+const settingsJson = fs.readFileSync('/app/test-settings.json', 'utf-8');
 const settingsObj = JSON.parse(settingsJson);
 
 const { selectedBrowsers, testAllSuites, suites, sequential, videoWidth, videoHeight } = settingsObj;
 
 const workers = sequential ? 1 : undefined;
 
-const availableProjects = JSON.parse(fs.readFileSync('tests-data/available-projects.json', 'utf-8'));
+const availableProjects = JSON.parse(fs.readFileSync('/app/settings/available-browsers.json', 'utf-8'));
 
 const projects = availableProjects
 .filter(project => selectedBrowsers.includes(project.name))
@@ -39,7 +39,7 @@ if(testAllSuites){
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir: '/app/tests',
   testMatch,
   /* Run tests in files in parallel */
   fullyParallel: true,

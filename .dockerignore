@@ -1,6 +1,11 @@
 node_modules
 .gitignore
+.dockerignore
+seccomp_profile.json
 playwright-report
 test-results
+Agents.md
+CLAUDE.md
 README.md
 example-app
+*.db

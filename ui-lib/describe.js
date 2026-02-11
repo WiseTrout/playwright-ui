@@ -1,4 +1,4 @@
-import readSettingsSync from "../helpers/read-settings-sync";
+import readSettingsSync from "../ui-lib/read-settings-sync";
 import { test } from "./fixtures";
 
 

@@ -60,7 +60,7 @@
       "name": "dummyFileInput",
       "label": "Some more tests info",
       "accept": "txt",
-      "savePath": "/tests-data/dummy-data.txt"
+      "savePath": "/metadata/dummy-data.txt"
     }
   ]
 }

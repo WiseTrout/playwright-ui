@@ -10,11 +10,11 @@ To begin, copy the contents of /example-app into your directory.
 
 ### App settings
 
-The file app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /tests-data/available-projects.json). 
+The file app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /metadata/available-browsers.json). 
 
 The property "globalSettings" is an array of inputs that will be shown in menu and applied to all tests. These can be accessed inside the test files:
 ```
-import readSettingsSync from '../helpers/read-settings-sync.js';
+import readSettingsSync from '../ui-lib/read-settings-sync.js';
 const settings = readSettingsSync();
 const { baseUrl } = settings.global;
 ```
@@ -29,7 +29,7 @@ The "fileUploads" array is a list of files that can be uploaded via the /setting
       "name": "dummyFileInput",
       "label": "Some more tests info",
       "accept": "txt",
-      "savePath": "/tests-data/dummy-data.txt"
+      "savePath": "/metadata/dummy-data.txt"
     }
   ]
 ```
@@ -112,7 +112,7 @@ Note: if a sequential suite is chosen, *all* tests will run sequentially, not ju
 
 1) Registering the test 
 
-Pick a name for the test file, it must end in ".spec.js". For example, "my-new-test.spec.js". Add this filename to the list of test file names in one of the existing suites. For example, if we want to add this test to "My new suite", we will edit "/tests-data/suites/my-new-suite/suite-metadata.json":
+Pick a name for the test file, it must end in ".spec.js". For example, "my-new-test.spec.js". Add this filename to the list of test file names in one of the existing suites. For example, if we want to add this test to "My new suite", we will edit "/metadata/suites/my-new-suite/suite-metadata.json":
 
 ```
 {
@@ -129,13 +129,13 @@ The test file must be placed inside "/tests" and have the name we picked in step
 
 All tests must be grouped, these will be the test categories that we see in the menu. When there are several test files in one suite, all the test groups across all files will be concatenated and shown as one list under that suite name. To group tests inside a test file, one must call the createDescribe() function and pass the file name to it. The returned value will be a function that can be used the same way that a test.describe() function would. The difference is that behind the scenes, this new function reads the test settings and filters out the categories we must skip when we launch the tests. 
 
-The separate tests inside of each group must be registered using the test() function. *Important*: this function must be imported from "../tests-lib/fixtures.js", *not* directly from Playwright. The reason is that the fixture adds test progress logging.
+The separate tests inside of each group must be registered using the test() function. *Important*: this function must be imported from "../ui-lib/fixtures.js", *not* directly from Playwright. The reason is that the fixture adds test progress logging.
 
 Example:
 
 ```
-import { test } from "../tests-lib/fixtures.js";
-import createDescribe from '../tests-lib/describe.js';
+import { test } from "../ui-lib/fixtures.js";
+import createDescribe from '../ui-lib/describe.js';
 
 const describe = createDescribe("my-new-test.spec.js");
 
@@ -153,7 +153,7 @@ describe('category 1', () => {
 
 3) Optional: add beforeEach() and afterEach() functions:
 
-If you want to add a beforeEach function to run before every one of your tests or an afterEach function to run after each test, you can add this logic inside the functions in /test-hooks/before-each.js and /test-hooks/after-each.js.
+If you want to add a beforeEach function to run before every one of your tests or an afterEach function to run after each test, you can add this logic inside the functions in /hooks/before-each.js and /hooks/after-each.js.
 
 ### Running tests
 
