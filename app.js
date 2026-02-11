@@ -14,6 +14,7 @@ import session from 'express-session';
 import { csrfSync } from "csrf-sync";
 import sqlite from "better-sqlite3";
 import bsql3ss from "better-sqlite3-session-store";
+import {suite} from "node:test";
 
 console.log('Launching menu...');
 
@@ -201,11 +202,11 @@ app.post('/run-tests', authenticationMiddleware, async (req, res) => {
 
 app.post('/update-settings', authenticationMiddleware, async (req, res) => {
 
-    const oldSettings = JSON.parse(fs.readFileSync('app-settings.json'));
+    const oldSettings = JSON.parse(fs.readFileSync('settings/app-settings.json'));
 
     appSettings = updateAppSettings(oldSettings, req);
 
-    const settingsWritePromise = fs.promises.writeFile('app-settings.json', JSON.stringify(appSettings ,null, 2));
+    const settingsWritePromise = fs.promises.writeFile('settings/app-settings.json', JSON.stringify(appSettings ,null, 2));
 
     const promises = [settingsWritePromise];
 
@@ -254,7 +255,6 @@ loadAppInfo().then(({browsers, suites, settings}) => {
     availableBrowsers = browsers;
     testSuites = suites;
     appSettings = settings;
-
     app.listen(3000, () => console.log(`Testing menu is available at http://localhost:${process.env.TESTS_MENU_PORT || 3000}`));
 })
 
@@ -431,7 +431,7 @@ async function loadAppInfo(){
 }
 
 async function readAvailableBrowsers(){
-    const json = await fs.promises.readFile('tests-data/available-projects.json');
+    const json = await fs.promises.readFile('settings/available-browsers.json');
     const availableProjects = JSON.parse(json, 'utf-8'); 
     return availableProjects.map(pr => pr.name);
 }
@@ -458,7 +458,7 @@ async function getTestFilesInfo(){
 
     return new Promise((res, rej) => {
         let json = '';
-        const process = spawn('npx', ['playwright', 'test', '--list', '--reporter=json']);
+        const process = spawn('npx', ['playwright', 'test', '--config', '/app/settings/playwright.config.js', '--list', '--reporter=json']);
 
         process.stdout.setEncoding('utf-8');
 
@@ -485,7 +485,7 @@ async function getTestFilesInfo(){
 
 async function readSuitesMetadata(){
 
-    const testSuitesDir = path.join(__dirname, 'tests-data', 'suites');
+    const testSuitesDir = path.join(__dirname, 'metadata', 'suites');
 
     const suiteNames = await fs.promises.readdir(testSuitesDir);
 
@@ -530,13 +530,13 @@ function combineTestAndSuiteInfo(testFiles, suitesMetadata){
 }
 
 async function readAppSettings(){
-    const json = await fs.promises.readFile('app-settings.json', 'utf-8');
+    const json = await fs.promises.readFile('settings/app-settings.json', 'utf-8');
     return JSON.parse(json);
 }
 
 function launchTests(settingsObj){
     return new Promise((res, rej) => {
-        const testSpawnOptions = ['playwright', 'test'];
+        const testSpawnOptions = ['playwright', 'test', '--config', '/app/settings/playwright.config.js'];
 
         if(settingsObj.global.visualRegression === 'update') testSpawnOptions.push('--update-snapshots');
 
@@ -568,7 +568,7 @@ function launchTests(settingsObj){
 
 function launchPlaywrightReport(){
     return new Promise((res, rej) => {
-        playwrightReportProcess = spawn('npx',  ['playwright', 'show-report', '--host',  '0.0.0.0'], {detached: true});
+        playwrightReportProcess = spawn('npx',  ['playwright', 'show-report', '--host',  '0.0.0.0', '--config', '/app/settings/playwright.config.js'], {detached: true});
         playwrightReportProcess.on('spawn', () => {
             res();
         })
