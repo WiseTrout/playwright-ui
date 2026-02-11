@@ -1,10 +1,10 @@
 services:
-    my-tests:
+    tests-ui:
       init: true
-      build: .
-      ports: 
-        - ${TESTS_MENU_PORT:-3000}:3000
-        - ${TESTS_RESULTS_PORT:-9323}:9323
+      image: ghcr.io/wisetrout/playwright-ui:latest
+      ports:
+        - ${TESTS_MENU_PORT:-8000}:3000
+        - ${TESTS_RESULTS_PORT:-8323}:9323
       environment:
         - TESTS_MENU_PORT
         - TESTS_RESULTS_PORT
@@ -12,14 +12,7 @@ services:
         - seccomp=seccomp_profile.json
       volumes:
         - type: bind
-          source: ./tests
-          target: /app/tests
-        - type: bind
-          source: ./tests-data
-          target: /app/tests-data
-        - type: bind
-          source: ./tests-hooks
-          target: /app/tests-hooks
-        - type: bind
-          source: ./app-settings.json
-          target: /app/app-settings.json
+          source: ./hooks
+          target: /app/hooks
+        - type: volume
+          target: /app/settings

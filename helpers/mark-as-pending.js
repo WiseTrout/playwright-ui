@@ -1,5 +1,5 @@
-import { logTests } from "./log-test";
-import readSettingsSync from "./read-settings-sync";
+import { logTests } from "./log-test.js";
+import readSettingsSync from "../ui-lib/read-settings-sync.js";
 
 export function markAsPending(testGroups){
 

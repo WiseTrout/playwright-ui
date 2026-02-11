@@ -10,11 +10,11 @@ To begin, copy the contents of /example-app into your directory.
 
 ### App settings
 
-The file app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /tests-data/available-projects.json). 
+The file app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /metadata/available-browsers.json). 
 
 The property "globalSettings" is an array of inputs that will be shown in menu and applied to all tests. These can be accessed inside the test files:
 ```
-import readSettingsSync from '../helpers/read-settings-sync.js';
+import readSettingsSync from '../ui-lib/read-settings-sync.js';
 const settings = readSettingsSync();
 const { baseUrl } = settings.global;
 ```
@@ -29,7 +29,7 @@ The "fileUploads" array is a list of files that can be uploaded via the /setting
       "name": "dummyFileInput",
       "label": "Some more tests info",
       "accept": "txt",
-      "savePath": "/tests-data/dummy-data.txt"
+      "savePath": "/metadata/dummy-data.txt"
     }
   ]
 ```
@@ -112,7 +112,7 @@ Note: if a sequential suite is chosen, *all* tests will run sequentially, not ju
 
 1) Registering the test 
 
-Pick a name for the test file, it must end in ".spec.js". For example, "my-new-test.spec.js". Add this filename to the list of test file names in one of the existing suites. For example, if we want to add this test to "My new suite", we will edit "/tests-data/suites/my-new-suite/suite-metadata.json":
+Pick a name for the test file, it must end in ".spec.js". For example, "my-new-test.spec.js". Add this filename to the list of test file names in one of the existing suites. For example, if we want to add this test to "My new suite", we will edit "/metadata/suites/my-new-suite/suite-metadata.json":
 
 ```
 {

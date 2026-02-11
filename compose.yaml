@@ -1,14 +1,35 @@
 services:
+  pw-ui-nochrome:
+    init: true
+    ipc: host
+    command: tail /dev/null -f
+    build:
+      args:
+        INSTALL_CHROME: 0
+      context: .
+      labels:
+        org.opencontainers.image.source: https://github.com/wisetrout/playwright-ui
+        org.opencontainers.image.description: "Playwright UI"
+        org.opencontainers.image.licenses: MIT
+      tags:
+        - "0.3-nochrome"
+        - "nochrome"
+    ports:
+      - ${TESTS_MENU_PORT:-5000}:3000
+      - ${TESTS_RESULTS_PORT:-5001}:9323
   pw-ui:
     init: true
     ipc: host
+    command: tail /dev/null -f
     build:
       context: .
       labels:
         org.opencontainers.image.source: https://github.com/wisetrout/playwright-ui
         org.opencontainers.image.description: "Playwright UI"
         org.opencontainers.image.licenses: MIT
-    #command: tail -f /dev/null
+      tags:
+        - "0.3"
+        - "latest"
     ports:
       - ${TESTS_MENU_PORT:-3000}:3000
       - ${TESTS_RESULTS_PORT:-9323}:9323
@@ -21,8 +42,8 @@ services:
       - TESTS_RESULTS_PORT
     security_opt:
       - seccomp=seccomp_profile.json
-#    volumes:
-#      - .:/app
+    volumes:
+      - ./app.js:/app.js
       # Expose the library to the host for IDE indexing (Read-Only)
 #      - ./ui-lib:/app/ui-lib:ro
 #      - /app/node_modules
