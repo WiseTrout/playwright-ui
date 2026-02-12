@@ -4,7 +4,7 @@ import path from 'path';
 export let suitesMedatadata = [];
 
 export async function readSuitesMetadata(){
-    const testSuitesDir = path.join('tests-data', 'suites');
+    const testSuitesDir = path.join('metadata', 'suites');
     
         const suiteNames = await fs.promises.readdir(testSuitesDir);
     

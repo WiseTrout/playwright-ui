@@ -3,8 +3,8 @@ services:
       init: true
       image: ghcr.io/wisetrout/playwright-ui:latest
       ports:
-        - ${TESTS_MENU_PORT:-8000}:3000
-        - ${TESTS_RESULTS_PORT:-8323}:9323
+        - ${TESTS_MENU_PORT:-3000}:3000
+        - ${TESTS_RESULTS_PORT:-9323}:9323
       environment:
         - TESTS_MENU_PORT
         - TESTS_RESULTS_PORT
@@ -14,5 +14,11 @@ services:
         - type: bind
           source: ./hooks
           target: /app/hooks
-        - type: volume
+        - type: bind
+          source: ./tests
+          target: /app/tests
+        - type: bind
+          source: ./metadata
+          target: /app/metadata
+        - type: bind
           target: /app/settings
