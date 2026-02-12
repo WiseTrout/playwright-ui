@@ -2,6 +2,7 @@ services:
   pw-ui:
     init: true
     ipc: host
+    # command: tail /dev/null -f
     build:
       # args:
       #   INSTALL_CHROME: 0
