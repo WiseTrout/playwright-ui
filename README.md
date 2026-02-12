@@ -10,7 +10,7 @@ To begin, copy the contents of /example-app into your directory.
 
 ### App settings
 
-The file app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /metadata/available-browsers.json). 
+The file /settings/app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /metadata/available-browsers.json). 
 
 The property "globalSettings" is an array of inputs that will be shown in menu and applied to all tests. These can be accessed inside the test files:
 ```
@@ -64,8 +64,7 @@ services:
 ### Adding authentication
 
 To enable authentication, add USERNAME variable to .env and uncomment password.txt session in compose.yaml.
-Other environment variables that affect authentication are: SALT_ROUNDS (used to encrypt password, default is 10),
-SESSION_SECRET (default is to randomly generate secret on app start), SESSION_COOKIE_MAX_AGE.
+Other environment variables that affect authentication are: SALT_ROUNDS (used to encrypt password, default is 10), SESSION_SECRET (default is to randomly generate secret on app start), SESSION_COOKIE_MAX_AGE.
 
 Create empty "password.txt" file in the root directory.
 
@@ -91,7 +90,7 @@ The first time the container is launched, you will be prompted to set a password
 
 #### Creating new test suite
 
-1) To begin, create a new folder inside /test-suites and give this folder the machine name of the suite. For example, /test-suites/my-new-suite.
+1) To begin, create a new folder inside /metadata/suites and give this folder the machine name of the suite. For example, /metadata/suites/my-new-suite.
 
 2) Inside the folder create a file named suite-metadata.json with the description of the suite:
 
