@@ -178,7 +178,7 @@ After that, uncomment the corresponding bind in compose.yaml:
 ```
 - type: bind
   source: ./package.json
-  target: /app/testing-packages/package.json
+  target: /app/aux-dependencies/package.json
 ```
 
 When you restart the container, the Node modules will be installed inside the container and you will be able to use them in your tests.

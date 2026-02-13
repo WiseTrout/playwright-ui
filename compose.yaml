@@ -82,8 +82,8 @@ services:
         source: ./password.txt
         target: /app/password.txt
       - type: bind
-        source: ./testing-packages
-        target: /app/testing-packages
+        source: ./aux-dependencies
+        target: /app/aux-dependencies
       - type: bind
         source: ./node_modules
         target: /app/node_modules

@@ -24,6 +24,6 @@
     "express-session": "^1.19.0"
   },
   "workspaces": [
-    "testing-packages"
+    "aux-dependencies"
   ]
 }
