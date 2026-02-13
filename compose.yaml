@@ -78,9 +78,12 @@ services:
       - type: bind
         source: ./settings
         target: /app/settings
-      
-#      Create empty file password.txt and uncomment the following lines to use authorization.
-#      To reset the password, empty the contents of existing password.txt
       - type: bind
         source: ./password.txt
         target: /app/password.txt
+      - type: bind
+        source: ./testing-packages
+        target: /app/testing-packages
+      - type: bind
+        source: ./node_modules
+        target: /app/node_modules

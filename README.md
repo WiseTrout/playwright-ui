@@ -154,6 +154,36 @@ describe('category 1', () => {
 
 If you want to add a beforeEach function to run before every one of your tests or an afterEach function to run after each test, you can add this logic inside the functions in /hooks/before-each.js and /hooks/after-each.js.
 
+#### Adding npm modules
+
+You may need to add npm packages to use in your tests. To do so, create a package.json file in your root directory, specifying the packages you want to add (using "npm init"):
+
+```
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "package-i-want-to-add": "^1.1.0"
+  }
+}
+```
+After that, uncomment the corresponding bind in compose.yaml:
+
+```
+- type: bind
+  source: ./package.json
+  target: /app/testing-packages/package.json
+```
+
+When you restart the container, the Node modules will be installed inside the container and you will be able to use them in your tests.
+
+
 ### Running tests
 
 To launch the menu for the first time, one must create a Docker container for the tests:

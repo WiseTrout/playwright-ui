@@ -9,10 +9,10 @@ fi
 cd /app
 
 # Optionally install dependencies.
-if [ ! -d "/app/node_modules" ] || [ -z "$(ls -A /app/node_modules 2>/dev/null)" ]; then
+# if [ ! -d "/app/node_modules" ] || [ -z "$(ls -A /app/node_modules 2>/dev/null)" ]; then
   echo "Installing dependencies..."
   npm install
-fi
+# fi
 
 chown -R ubuntu /app
 

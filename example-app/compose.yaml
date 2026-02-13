@@ -21,4 +21,14 @@ services:
           source: ./metadata
           target: /app/metadata
         - type: bind
+          source: ./settings
           target: /app/settings
+        #  Create empty file password.txt and uncomment the following lines to use authorization.
+        #  To reset the password, empty the contents of existing password.txt
+        # - type: bind
+        #   source: ./password.txt
+        #   target: /app/password.txt
+        # Uncomment this to add npm packages to project
+        # - type: bind
+        #   source: ./package.json
+        #   target: /app/testing-packages/package.json

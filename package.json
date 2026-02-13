@@ -22,5 +22,8 @@
     "express-fileupload": "^1.5.2",
     "express-handlebars": "^8.0.5",
     "express-session": "^1.19.0"
-  }
+  },
+  "workspaces": [
+    "testing-packages"
+  ]
 }
