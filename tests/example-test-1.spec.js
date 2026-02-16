@@ -20,6 +20,8 @@ describe('Basic tests', () => {
             await expect(page).toHaveTitle('Contact Us | Wise Trout');
         });
 
+        test('failing test', async () => { await expect(0).toEqual(1) })
+
 });
 
 

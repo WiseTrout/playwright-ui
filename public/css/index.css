@@ -330,6 +330,10 @@ form > ul:last-of-type {
     color: var(--color-failed);
 }
 
+.text--complete{
+    color: darkblue;
+}
+
 .btn-danger{
     background-color: rgb(255, 157, 157);
     color: rgb(132, 45, 45);
