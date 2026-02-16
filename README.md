@@ -2,15 +2,23 @@
 
 ## Description
 
-This repository allows to configure and show a Playwright testing menu in the browser. Tests can then be launched directly from this menu, instead of using the command line. The testing menu uses a Docker container, therefore it does *not* require Node.js or NPM to be installed, just Docker.
+This repository contains the code used to build the playwright UI image (https://github.com/WiseTrout/playwright-ui/pkgs/container/playwright-ui). For ghcr usage example and instructions, see https://github.com/WiseTrout/playwright-ui-example.
 
-## Usage
+The repository allows to configure and show a Playwright testing menu in the browser. Tests can then be launched directly from this menu, instead of using the command line. The testing menu uses a Docker container, therefore it does *not* require Node.js or NPM to be installed, just Docker.
 
-To begin, copy the contents of /example-app into your directory.
+This image is based on the Playwright testing library and uses a NodeJS server to create a browser UI for launching tests. When authentication is enabled, the password is encrypted using bcrypt and csrf protection is enabled with csrf-sync.
 
+## Usage without ghcr
+
+This repo can also be used directly, building the Docker image locally instead of downloading it from ghcr. Note that this will take longer than using ghcr because Playwright needs to download the testing browsers inside the container. You will need to have Docker installed on your machine but you do *not* need to have NodeJS or npm.
+
+Start by cloning the repository:
+```
+git clone https://github.com/WiseTrout/playwright-ui.git
+```
 ### App settings
 
-The file app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /metadata/available-browsers.json). 
+The file /settings/app-settings.json can be modified to suit your needs. "applicationName" property will be the title of the page and the menu header. The required property "defaultBrowsersToUse" is an array of browsers that will be selected by default to run the tests (full list of available browsers is inside /metadata/available-browsers.json). 
 
 The property "globalSettings" is an array of inputs that will be shown in menu and applied to all tests. These can be accessed inside the test files:
 ```
@@ -20,6 +28,8 @@ const { baseUrl } = settings.global;
 ```
 
 If a global setting has "showInSettingsPage" set to true, you will be able to update its default value via the /settings page.
+
+The "visualRegression" input is useful if your tests include visual regression checks - if set to "update", all snapshots for the selected tests will be updated. The "skip" and "test" values can be read and used to conditionally test visual regression inside your test files.
 
 The "fileUploads" array is a list of files that can be uploaded via the /settings page to be used later:
 
@@ -33,6 +43,7 @@ The "fileUploads" array is a list of files that can be uploaded via the /setting
     }
   ]
 ```
+
 ### Setting environment variables
 
 You can create a .env file and set new values inside it: TEST_MENU_PORT and TEST_RESULTS_PORT to change the ports that serve the menu and the test results. This file can also be used to pass secrets and additional settings to the container:
@@ -63,9 +74,8 @@ services:
 
 ### Adding authentication
 
-To enable authentication, add USERNAME variable to .env and uncomment password.txt session in compose.yaml.
-Other environment variables that affect authentication are: SALT_ROUNDS (used to encrypt password, default is 10),
-SESSION_SECRET (default is to randomly generate secret on app start), SESSION_COOKIE_MAX_AGE.
+To enable authentication, add USERNAME variable to .env and uncomment password.txt bind in compose.yaml.
+Other environment variables that affect authentication are: SALT_ROUNDS (used to encrypt password, default is 10), SESSION_SECRET (default is to randomly generate secret on app start), SESSION_COOKIE_MAX_AGE (in milliseconds).
 
 Create empty "password.txt" file in the root directory.
 
@@ -89,9 +99,11 @@ The first time the container is launched, you will be prompted to set a password
 
 ### Developing tests
 
+The repo contains some dummy tests and test suites as examples. You can delete these and replace with your own. To delete the example tests, simply empty the contents of /tests and /metadata/suites. 
+
 #### Creating new test suite
 
-1) To begin, create a new folder inside /test-suites and give this folder the machine name of the suite. For example, /test-suites/my-new-suite.
+1) To begin, create a new folder inside /metadata/suites and give this folder the machine name of the suite. For example, /metadata/suites/my-new-suite.
 
 2) Inside the folder create a file named suite-metadata.json with the description of the suite:
 
@@ -139,6 +151,7 @@ import createDescribe from '../ui-lib/describe.js';
 
 const describe = createDescribe("my-new-test.spec.js");
 
+
 describe('category 1', () => {
     test('Test 1', () => {
         // ...
@@ -155,6 +168,44 @@ describe('category 1', () => {
 
 If you want to add a beforeEach function to run before every one of your tests or an afterEach function to run after each test, you can add this logic inside the functions in /hooks/before-each.js and /hooks/after-each.js.
 
+#### Adding npm modules
+
+You may need to add npm packages to use in your tests. The project uses npm workspaces to split the list of packages into two package.json files. One of them is in the root directory and contains packages needed to run the app itself, and one is inside aux-packages and contains packages required by the test files. To add new packages, rewrite "aux-dependencies/package.json" to suit your needs:
+
+```
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "package-i-want-to-add": "^1.1.0"
+  }
+}
+```
+This update will require container restart. You can create the file contents on your own, or you can use the container to update its contents. To do so, run the following command (while the container is running) to find container id:
+
+```
+docker ps
+```
+
+Using that id, enter the container command line:
+
+```
+docker exec -t <container id> sh
+```
+
+and install the needed packages:
+
+```
+npm install <desired package name> workspace=aux-dependencies
+```
+This will add the packages to /aux-dependencies/package.json.
+
 ### Running tests
 
 To launch the menu for the first time, one must create a Docker container for the tests:
@@ -162,6 +213,8 @@ To launch the menu for the first time, one must create a Docker container for th
 ```
 docker-compose up --build
 ```
+
+This step will take a while to complete.
 
 To stop the container:
 
@@ -178,3 +231,5 @@ docker-compose up
 After the container has been created, the testing menu will be available at 'http://localhost:3000' (or a different port, see "updating settings" section) in the browser. Select the necessary settings and click on "run tests". The page will show how the tests are progressing, which ones are pending (⏸️), running (▶️), passed (✅) or failed (❌).
 
 Once the tests are done, you can click on "view test results". You will be redirected to http://localhost:9323 (or whatever port has been set in settings), where the tests report is served with additional details about how the tests went. To run new tests, go back to 'http://localhost:3000'.
+
+

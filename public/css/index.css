@@ -51,7 +51,7 @@ h3 {
     font-weight: 600;
 }
 
-header form{
+.invisible-form{
     background: none;
     box-shadow: none;
     padding: 0;

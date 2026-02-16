@@ -1,27 +1,11 @@
 services:
-  pw-ui-nochrome:
-    init: true
-    ipc: host
-    command: tail /dev/null -f
-    build:
-      args:
-        INSTALL_CHROME: 0
-      context: .
-      labels:
-        org.opencontainers.image.source: https://github.com/wisetrout/playwright-ui
-        org.opencontainers.image.description: "Playwright UI"
-        org.opencontainers.image.licenses: MIT
-      tags:
-        - "0.3-nochrome"
-        - "nochrome"
-    ports:
-      - ${TESTS_MENU_PORT:-5000}:3000
-      - ${TESTS_RESULTS_PORT:-5001}:9323
   pw-ui:
     init: true
     ipc: host
-    command: tail /dev/null -f
+    # command: tail /dev/null -f
     build:
+      # args:
+      #   INSTALL_CHROME: 0
       context: .
       labels:
         org.opencontainers.image.source: https://github.com/wisetrout/playwright-ui
@@ -30,7 +14,7 @@ services:
       tags:
         - "0.3"
         - "latest"
-    ports:
+    ports: 
       - ${TESTS_MENU_PORT:-3000}:3000
       - ${TESTS_RESULTS_PORT:-9323}:9323
     environment:
@@ -43,16 +27,63 @@ services:
     security_opt:
       - seccomp=seccomp_profile.json
     volumes:
-      - ./app.js:/app.js
-      # Expose the library to the host for IDE indexing (Read-Only)
-#      - ./ui-lib:/app/ui-lib:ro
-#      - /app/node_modules
-      # 3. Persist node_modules inside the container
-#      - pw_ui_node_modules:/app/node_modules
-#      Create empty file password.txt and uncomment the following lines to use authorization.
-#      To reset the password, empty the contents of existing password.txt
-#      - type: bind
-#        source: ./password.txt
-#        target: /app/password.txt
-#volumes:
-#  pw_ui_node_modules:
+      - type: bind
+        source: ./app.js
+        target: /app/app.js
+      - type: bind
+        source: ./tests
+        target: /app/tests
+      - type: bind
+        source: ./public
+        target: /app/public
+      - type: bind
+        source: ./metadata
+        target: /app/metadata
+      - type: bind
+        source: ./helpers
+        target: /app/helpers
+      - type: bind
+        source: ./playwright.config.js
+        target: /app/playwright.config.js
+      - type: bind
+        source: ./package.json
+        target: /app/package.json
+      - type: bind
+        source: ./package-lock.json
+        target: /app/package-lock.json
+      - type: bind
+        source: ./test-settings.json
+        target: /app/test-settings.json
+      - type: bind
+        source: ./default-test-settings.json
+        target: /app/default-test-settings.json
+      - type: bind
+        source: ./ui-lib
+        target: /app/ui-lib
+      - type: bind
+        source: ./hooks
+        target: /app/hooks
+      - type: bind
+        source: ./models
+        target: /app/models
+      - type: bind
+        source: ./controllers
+        target: /app/controllers
+      - type: bind
+        source: ./views
+        target: /app/views
+      - type: bind
+        source: ./routes
+        target: /app/routes
+      - type: bind
+        source: ./settings
+        target: /app/settings
+      - type: bind
+        source: ./password.txt
+        target: /app/password.txt
+      - type: bind
+        source: ./aux-dependencies
+        target: /app/aux-dependencies
+      - type: bind
+        source: ./node_modules
+        target: /app/node_modules

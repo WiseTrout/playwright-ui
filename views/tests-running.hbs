@@ -1,9 +1,13 @@
 <h1>Tests running...</h1>
-<button disabled onclick="window.location.href = 'http://localhost:{{menuPort}}'"> Run new tests</button>
+<button disabled onclick="window.location.href = 'http://localhost:{{menuPort}}/tests'"> Run new tests</button>
 <br>
 <button disabled onclick="window.location.href = 'http://localhost:{{resultsPort}}'">View test results</button>
 <br>
-<button class="btn-danger" data-menu-port='{{menuPort}}'>Stop tests</button>
+<form action="/tests/stop" method="post" class="invisible-form">
+    <input type="hidden" value="{{csrfToken}}" name="csrfToken">
+    <button class="btn-danger">Stop tests</button>
+</form>
+
 
 <h3>Symbols:</h3>
 <ul>

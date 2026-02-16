@@ -49,22 +49,10 @@ function startPeriodicDataUpdate(){
     }
     requestInProcess = false;
     }, UPDATE_INTERVAL_MS);
-
-    stopButton.onclick = () => {
-        h1.innerText = 'Stopping tests...';
-        
-        fetch('/stop-tests').then(() => {
-            h1.innerText = 'Tests stopped';
-            clearInterval(interval);
-            retryBtn.disabled = false;
-            viewResultsBtn.disabled = true;
-            window.location.href = `http://localhost:${stopButton.getAttribute('data-menu-port')}`;
-        });
-    }
 }
 
 async function fetchData(){
-    const res = await fetch('/get-tests-update');
+    const res = await fetch('/tests/get-update');
     if(!res.ok) throw new Error('Response not okay');
     const json = await res.json();
     return json;
