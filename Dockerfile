@@ -1,4 +1,5 @@
-FROM mcr.microsoft.com/playwright:v1.57.0-noble
+ARG INSTALL_CHROME="1"
+FROM mcr.microsoft.com/playwright:v1.58.2-noble
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y gosu && rm -rf /var/lib/apt/lists/*
@@ -16,6 +17,5 @@ RUN npx playwright install --with-deps
 RUN if [ "$INSTALL_CHROME" = "1" ] ; then npx playwright install chrome ; fi
 
 ENTRYPOINT ["entrypoint.sh"]
-
 EXPOSE 3000 9323
 CMD ["node", "app.js"]
