@@ -163,6 +163,9 @@ function displayTestCounts(element, testCounts){
         element.querySelector('.label--' + status).innerText = testCounts[status];
     }
 
+    const overallStatus = getOverallStatus(testCounts);
+    element.classList.add('text--' + overallStatus)
+
 }
 
 function createTestItem(title, browser, status, message){
@@ -188,4 +191,12 @@ function createTestItem(title, browser, status, message){
 
 function cleanText(string){
     return string.replaceAll(/\[[1-9]*m/g, '').replaceAll('\u001b', '');
+}
+
+function getOverallStatus(testCounts){
+    if(testCounts.pending === testCounts.total) return 'pending';
+    if(testCounts.running) return 'running';
+    if(testCounts.passed === testCounts.total) return 'passed';
+    if(testCounts.failed === testCounts.total) 'failed';
+    return 'complete';
 }
