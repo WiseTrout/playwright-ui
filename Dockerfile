@@ -1,5 +1,5 @@
-ARG INSTALL_CHROME="1"
 FROM mcr.microsoft.com/playwright:v1.58.2-noble
+ARG INSTALL_CHROME=1
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y gosu && rm -rf /var/lib/apt/lists/*
@@ -14,7 +14,12 @@ RUN rm /app/entrypoint.sh
 COPY ./ui-lib /app/ui-lib-backup
 
 RUN npx playwright install --with-deps
-RUN if [ "$INSTALL_CHROME" = "1" ] ; then npx playwright install chrome ; fi
+RUN if [ "$INSTALL_CHROME" = "1" ] ; then \
+    echo "Installing Chrome" && \
+    npx playwright install chrome ; \
+    else \
+      echo "Skip Chrome" ; \
+    fi
 
 ENTRYPOINT ["entrypoint.sh"]
 EXPOSE 3000 9323

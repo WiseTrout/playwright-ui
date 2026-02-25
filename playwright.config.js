@@ -39,6 +39,7 @@ if(testAllSuites){
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
+  snapshotPathTemplate: './screenshots/{projectName}/{testFileName}/{arg}{ext}',
   testDir: './tests',
   testMatch,
   /* Run tests in files in parallel */
